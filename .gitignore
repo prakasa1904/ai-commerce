@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Production build artifacts
+dist/
+
+# Vite dev server files
+.vite/
+
+# Vite configuration (if not needed in repo)
+vite.config.js
+vite.config.ts
+
+# IDE and editor settings
+.vscode/
+.idea/
+.ensime/
+*.swp
+
+# OS files
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+
+# Coverage and testing files
+coverage/
+*.test.js
+*.test.ts
+
+# Build caches
+ Builds/
+
+# SQLite database
+farmer_marketplace.db
+
+# Server configuration files
+server/.gitignore
