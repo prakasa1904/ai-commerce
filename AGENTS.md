@@ -5,47 +5,7 @@ Build a production-grade web marketplace with React+Vite+Backend, apply React Be
 
 ---
 
-## PHASE 1: PROJECT SETUP
-
-**SOLUTION:**
-1. Create `client/index.html` with CDN React 18 UMD + Axios
-2. Use functional React with `React.createElement()` (not JSX)
-3. Wire `root.render(container)` after DOMContentLoaded
-4. Use Vite proxy for CORS bypass (`/api` → `http://localhost:5001`)
-5. Start backend: `node server/server.js`
-6. Start Vite: `npx vite --clearScreen false` in client folder
-7. Access: `http://localhost:5174/` (browser may show blank → F12 console should have **no errors**)
-
----
-
-## PHASE 2: MODERN DARK UI
-
-**FEATURES:**
-- Dark navy theme (`#0f172a` background, `#22c55e` accent)
-- Glassmorphism cards with `backdrop-filter`
-- 8 demo products with Unsplash images
-- Search + category pill filters
-- Hover effects (zoom image, lift card)
-- Add to cart buttons + favorite hearts
-- Professional footer (About, Support, Legal, Connect)
-- Responsive 4-column grid (mobile → 1 column)
-
-**KEY CSS:**
-```css
-:root {
-  --bg: #0f172a; --text: #f1f5f9; --accent: #22c55e;
-}
-.glass-card {
-  background: rgba(255,255,255,0.03);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 24px;
-}
-```
-
----
-
-## PHASE 3: REACT BEST PRACTICES (9 Steps)
+## REACT BEST PRACTICES (9 Steps)
 
 ### Step 1: TypeScript-First
 - All files must be `.tsx`
@@ -137,7 +97,7 @@ it('calls handler when clicked', () => {
 
 ---
 
-## PHASE 4: COMMON PITFALLS & FIXES
+## COMMON PITFALLS & FIXES
 
 | Pitfall | Fix | Category |
 |---------|-----|----------|
