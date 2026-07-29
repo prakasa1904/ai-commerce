@@ -1,1 +1,1 @@
-{"name":"farm-marketplace","version":"1.0.1","description":"","main":"server.js","scripts":{},"dependencies":{"cors":"^2.8.5","express":"^4.18.4","sqlite3":"^5.1.7"}}
+{"name":"farm-marketplace","version":"1.0.1","description":"","main":"server.js","scripts":{"dev":"vite","build":"vite build","preview":"vite preview"},"dependencies":{"cors":"^2.8.5","express":"^4.18.4","react":"^19.2.8","react-dom":"^19.2.8","sqlite3":"^5.1.7","vite":"^8.1.5"},"devDependencies":{"dotenv":"^16.4.5"}}

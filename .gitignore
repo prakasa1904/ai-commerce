@@ -41,3 +41,6 @@ farmer_marketplace.db
 
 # Server configuration files
 server/.gitignore
+backend.log
+backend_pid.txt
+frontend_pid.txt

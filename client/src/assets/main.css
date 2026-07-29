@@ -1,0 +1,13 @@
+/* Tailwind dark mode fix for UMD React */
+html, body, #root {
+  height: 100%;
+}
+
+a {
+  color: #22c55e;
+}
+
+button {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
