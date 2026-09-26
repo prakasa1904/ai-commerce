@@ -41,19 +41,22 @@ const ProductDetail = ({ product }: ProductDetailProps) => {
         <ProductBreadcrumb product={product} />
 
         <main className="grid lg:grid-cols-[14rem_1fr] items-start gap-8 lg:gap-12 animate-in fade-in duration-500">
-          <ProductGallery imageUrl={imageUrl} title={product.title} />
+          <ProductGallery imageUrl={imageUrl} title={product.title} category={product.category} />
 
           <section className="flex flex-col gap-7 lg:gap-12">
             <ProductMobileHeader product={product} />
             <ProductMeta product={product} />
-            <ProductInfo product={product} />
-            <PurchaseCard
-              product={product}
-              quantity={quantity}
-              total={total}
-              onQuantityChange={setQuantity}
-              onAddToCart={handleAddToCart}
-            />
+            {/* Field note (wide) + crate card (fixed sidebar): 2 columns, 1 row in grid view */}
+            <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-6">
+              <ProductInfo product={product} />
+              <PurchaseCard
+                product={product}
+                quantity={quantity}
+                total={total}
+                onQuantityChange={setQuantity}
+                onAddToCart={handleAddToCart}
+              />
+            </div>
             <FarmGuaranteeSection />
           </section>
         </main>

@@ -1,28 +1,57 @@
-import { Leaf, ShieldCheck, Truck } from 'lucide-react';
+import { Leaf } from 'lucide-react';
 
 const guarantees = [
-  { icon: Leaf, label: 'Hand-picked', desc: 'Picked at first light by local farmers' },
-  { icon: Truck, label: 'Free delivery', desc: 'Doorstep delivery on every order' },
-  { icon: ShieldCheck, label: 'Farm fresh', desc: 'Harvested to order, not to shelf' },
+  {
+    head: 'Picked at first light',
+    desc: 'The seller harvests the morning of your order — nothing from a warehouse shelf.',
+  },
+  {
+    head: 'Free delivery, same day',
+    desc: 'From the stall to your doorstep the same afternoon. We only use farmers within the valley.',
+  },
+  {
+    head: 'Packed to order',
+    desc: 'No middlemen, no pre-packed crates. Your bundle is tied and weighed when you buy.',
+  },
 ];
 
 const FarmGuaranteeSection = () => (
-  <section className="bg-cream/50 rounded-2xl border border-wheat/60 p-6 lg:p-8 max-w-5xl">
-    <h2 className="font-display text-sm font-black text-forest uppercase tracking-[0.25em] mb-5">
-      Why farm fresh?
-    </h2>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-8">
-      {guarantees.map((g) => (
-        <div key={g.label} className="flex gap-4 items-start">
-          <div className="shrink-0 mt-0.5 h-10 w-10 rounded-full bg-forest/10 text-forest flex items-center justify-center">
-            <g.icon className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <div>
-            <h3 className="font-display font-black text-lg text-forest">{g.label}</h3>
-            <p className="mt-1 text-sm leading-relaxed text-soil/70">{g.desc}</p>
-          </div>
-        </div>
-      ))}
+  <section aria-label="Why shop farm fresh" className="mt-2">
+    <div className="overflow-hidden rounded-2xl border-2 border-wheat-800/50 bg-kraft p-5 lg:p-6 relative">
+      {/* notebook spine */}
+      <span aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-2.5 bg-pine shadow-sm" />
+
+      <div className="relative">
+        <p className="font-display font-black text-[0.72rem] uppercase tracking-[0.3em] text-moss">
+          Field notes
+        </p>
+        <h2 className="mt-1 text-2xl font-display font-black text-forest">Why people buy from the field</h2>
+        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-soil/70">
+          A stall is a promise between a farmer and a cook. Here&apos;s what that means on every order.
+        </p>
+      </div>
+
+      <ul className="mt-6 space-y-7">
+        {guarantees.map((g) => (
+          <li key={g.head} className="flex gap-4">
+            {/* hand-stamped chalk tick */}
+            <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-honey/70 shadow-md">
+              <span className="text-forest font-display font-extrabold text-lg leading-none">&#10003;</span>
+            </span>
+            <div>
+              <h3 className="font-display font-black text-lg text-forest">{g.head}</h3>
+              <p className="mt-1 leading-relaxed text-sm text-soil/70">{g.desc}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-2 flex items-center gap-1.5 pt-5 border-t border-wheat-800/30">
+        <Leaf className="h-4 w-4 text-moss/70" aria-hidden="true" />
+        <span className="italic text-[0.75rem] text-soil/60 font-display">
+          Written up and sealed by the farmer, not a marketing desk.
+        </span>
+      </div>
     </div>
   </section>
 );
