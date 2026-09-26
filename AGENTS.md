@@ -1,7 +1,7 @@
 # 🌾 Farm Marketplace
 
 ## GOAL
-Build a production-grade web marketplace with React + Vite + TypeScript and an Express/SQLite backend. Apply React Best Practices, and solve common blank page issues.
+Build a production-grade web marketplace with React + Vite + TypeScript and an Express/SQLite backend. Apply React Best Practices, use **shadcn/ui as the base design UI/UX system** (accessible, themeable primitives), and solve common blank page issues.
 
 ---
 
@@ -10,7 +10,8 @@ Build a production-grade web marketplace with React + Vite + TypeScript and an E
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 18, Vite 5, TypeScript |
-| Styling | Tailwind CSS v4 (design tokens in `src/infrastructure/css/`) |
+| UI/UX System | shadcn/ui (Radix UI primitives) — design tokens in `src/infrastructure/css/` |
+| Styling | Tailwind CSS v4 |
 | Server State | TanStack Query v5 (`@tanstack/react-query`) |
 | Backend | Express 4, SQLite3 |
 | Build | `tsc && vite build` |
@@ -19,33 +20,59 @@ Build a production-grade web marketplace with React + Vite + TypeScript and an E
 
 ## HIGH-LEVEL ARCHITECTURE
 
-```
-                   ┌─────────────────────────┐
-                   │   Browser (Vite dev :5173)│
-                   └────────────┬────────────┘
-                                │  /api/products (fetch)
-              ┌─────────────────▼──────────────────┐
-              │  Vite proxy (/api → localhost:5001) │
-              └─────────────────┬──────────────────┘
-                                │
-                   ┌────────────▼─────────────┐
-                   │ Express API (port 5001)  │
-                   │  - GET /api/products     │
-                   │  - GET /api/auth/*       │
-                   │  - GET /api/cart         │
-                   └────────────┬─────────────┘
-                                │ sqlite3
-                   ┌────────────▼─────────────┐
-                   │ farmer_marketplace.db    │
-                   └──────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph client["Browser — Vite dev :5173"]
+        direction TB
+        UI["presentation/ — ui/ atoms/ molecules/ templates/ (shadcn/ui, Tailwind)"]
+        APP["main.tsx · App.tsx<br/>DataProvider (TanStack Query)"]
+        UI --> APP
+    end
+
+    subgraph dev["Vite dev proxy — vite.config.ts"]
+        P["GET /api/* → http://localhost:5001"]
+    end
+
+    subgraph backend["Express API — port 5001"]
+        direction TB
+        A["GET /api/products<br/>GET /api/auth/*<br/>GET /api/cart"]
+        DB[("farmer_marketplace.db — SQLite3")]
+        A -->|sqlite3| DB
+    end
+
+    APP -->|"fetch /api/products"| P --> A
+    A -->|"JSON (Product[])"| P --> APP
 ```
 
-### Data flow
-1. `DataProvider` (React Query) → `HomePage` → `GridViewProduct`
-2. `GridViewProduct` calls `useProducts()` (Application hook)
-3. `useProducts` → `productService.getProducts()` (Application service)
-4. `productService` → `productApi.fetchProducts()` (Infrastructure/fetch)
-5. `productApi` calls `GET /api/products` and maps the response into a `Product`
+### Data flow (presentation → application → infrastructure → domain)
+
+```mermaid
+flowchart LR
+    A["main.tsx"] -->|wraps| B["App"]
+    B --> C["HomePage"]
+    C --> D["GridViewProduct"]
+    D -->|consumes| E["useProducts"]
+    E -->|calls| F["productService"]
+    F -->|calls| G["productApi"]
+    G -->|GET /api/products| H["Express API"]
+    H -->|JSON| G
+    G -->|maps to Product rows| F
+    F -->|returns data| E
+    E -->|data + loading + error| D
+    D -->|renders| I["ProductCard"]
+    I -->|uses| J["shadcn/ui primitives"]
+```
+
+**Layer sequence (a request lifecycle):**
+1. `DataProvider` (`QueryClientProvider`) wraps the app tree — every query goes through the shared `queryClient` with `staleTime`/`gcTime`/`retry` defaults.
+2. `App` renders the `HomePage` template, which assembles `Header`, `Hero`, `GridViewCategory`, `GridViewProduct`, `SubscriptionBand`, `Footer`.
+3. `GridViewProduct` calls `useProducts()` (Presentation → Application hook).
+4. `useProducts` calls `productService.getProducts()` (Application → Application service).
+5. `productService` calls `productApi.fetchProducts()` (Application → Infrastructure/fetch).
+6. `productApi` calls `GET /api/products` and maps the response into typed `Product` domain objects.
+
+### Component rendering rules
+- **Every molecule renders the primitives it needs.** Build UI out of **shadcn/ui primitives first** (`ui/Button`, `ui/Card`, `ui/Input`, `ui/Badge`, `ui/Alert`), then compose them into atoms/molecules/templates. `GridViewProduct` and `ProductCard` are composed from primitives — do not re-implement an already-existing primitive in Presentation.
 
 ---
 
@@ -72,13 +99,16 @@ src/
 │   ├── cache/
 │   │   └── queryKeys.ts        # query key factory
 │   └── css/
-│       └── index.css           # Tailwind v4 + design tokens (@theme)
+│       └── index.css           # shadcn/ui tokens (@layer base vars) + Tailwind v4 @theme
 └── presentation/
     └── components/
-        ├── atoms/              # Header        (leaf/sun brand mark)
+        ├── ui/                 # shadcn/ui primitives (Button, Card, Input, Badge, Alert, Dialog)
+        ├── atoms/              # Header, BrandWordmark, Pill, ProductCard (leaf/sun brand mark)
         ├── molecules/          # GridViewCategory, GridViewProduct
         └── templates/          # Hero, SubscriptionBand, Footer, homePage
 ```
+
+The `ui/` folder holds our local copies of shadcn/ui primitives — modify them directly there.
 
 **Dependency Rule:** Lower layers MUST NOT import upper layers.
 
@@ -109,6 +139,7 @@ Follow the folder layout above. When adding a feature, place it in the correct l
 - **Maximum 50 lines** per component (templates ≤ 50, molecules ≤ 80 with sub-components)
 - Extract sub-components when logic > 20 lines
 - Single Responsibility Principle (one component = one job)
+- Build UI from **shadcn/ui primitives first** (`<Button>`, `<Card>`, `<Input>`, `<Badge>`, `<Dialog>`), then compose into atoms/molecules/templates. Do not re-implement an already-existing primitive.
 
 ### Step 4: State Management
 - **Local State:** `useState` for form inputs, loading flags, UI toggles (`searchQuery` in `GridViewProduct`)
@@ -133,7 +164,7 @@ const queryClient = new QueryClient({
 ### Step 5: Forms
 - Always **controlled components** (`value` + `onChange`)
 - Search input is the controlled-form example in this repo (`GridViewProduct.tsx`)
-- Use React Hook Form for validation when real forms are added
+- Use **shadcn/ui `Form`** (React Hook Form + Zod resolver) for any validation when real forms are added
 
 ### Step 6: Performance Optimization
 - **Query caching:** prefer `staleTime`/`gcTime` over refetching; use `queryKey`s for targeted invalidation
@@ -143,6 +174,7 @@ const queryClient = new QueryClient({
 ### Step 7: Error Boundaries
 - Async data loading uses TanStack Query's `isError` state with a fallback UI (see `GridViewProduct`)
 - Add a class-based `ErrorBoundary` around async route/page components as routes grow (no blank pages)
+- Surface errors with the shadcn/ui **`<Alert>`** component (variant `destructive` for errors)
 
 ### Step 8: Testing Standards
 - **Required coverage:** 100% for custom hooks and critical business logic
@@ -159,31 +191,65 @@ it('calls handler when clicked', () => {
 ### Step 9: Component Complexity Tiers
 | Tier | Max Lines | Example |
 |------|-----------|---------|
-| Atom | ≤20 | `<Header>` |
+| Atom | ≤20 | `<Header>`, `<Pill>` |
 | Molecule | ≤80 | `<GridViewCategory>`, `<GridViewProduct>` (with sub-components) |
 | Template | ≤50 | `<Hero>`, `<SubscriptionBand>`, `<Footer>` |
 | Page | ≤80 | `<HomePage>` |
 
 ---
 
-## DESIGN SYSTEM (Tailwind v4 tokens)
+## DESIGN SYSTEM (shadcn/ui base + Farm Marketplace palette)
 
-Theme lives in `src/infrastructure/css/index.css` under `@theme` and is imported once in `main.tsx`.
+The visual system follows **shadcn/ui conventions**: semantic HSL CSS variables defined under `@layer base` in `src/infrastructure/css/index.css` (imported once in `main.tsx`), then mapped onto the farm brand palette. This gives us accessible, themeable, Radix-based primitives.
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--color-forest` | `#1E3B2C` | Header bg, primary actions |
-| `--color-pine` | `#284B38` | Hover states |
-| `--color-moss` | `#7A9B6D` | Accents, borders |
-| `--color-honey` | `#E3A72F` | Accent (CTAs, price tags) |
-| `--color-wheat` | `#F6F1E4` | Page background |
-| `--color-cream` | `#FBF8F1` | Card backgrounds |
-| `--color-soil` | `#4A3628` | Body text |
-| `--color-clay` | `#B0653A` | Wholesale/subscription accents |
-| `--font-display` | Raleway | Headlines, wordmark |
-| `--font-body` | Public Sans | Body text |
+### Semantic tokens (HSL, opacity-friendly)
 
-Style with **Tailwind utility classes only** — no inline `style={{}}`, no ad-hoc CSS.
+```
+:root {
+  --radius: 0.5rem;
+
+  --background: 39 48% 93%;      /* wheat  #F6F1E4 — page background */
+  --foreground: 22 30% 22%;      /* soil   #4A3628 — body text */
+  --card:       34 56% 96%;      /* cream  #FBF8F1 — card surfaces */
+  --card-foreground: 22 30% 22%;
+
+  --primary:       152 33% 17%;  /* forest #1E3B2C — primary actions */
+  --primary-foreground: 34 56% 96%;
+
+  --secondary:     105 21% 52%;  /* moss   #7A9B6D — secondary actions */
+  --secondary-foreground: 34 56% 96%;
+
+  --muted:         34 20% 90%;   /* washed wheat */
+  --muted-foreground: 22 30% 22% / 0.65;
+
+  --accent:        105 21% 52%;  /* moss — decorative accents */
+  --accent-foreground: 22 30% 22%;
+
+  --destructive:   10 43% 42%;   /* blood  #A63D2F — errors/danger */
+  --destructive-foreground: 34 56% 96%;
+
+  --border:        39 30% 85%;
+  --input:         39 30% 85%;
+  --ring:          37 76% 54%;   /* honey  #E3A72F — focus rings/selection */
+}
+```
+
+Brand colors outside the semantic set are still available as Tailwind palette tokens in `@theme` (`forest/pine/moss/honey/wheat/cream/soil/leaf/clay` — see index.css) for pure brand accents.
+
+### Fonts
+- `--font-display: "Raleway"` — headlines, wordmark, hero
+- `--font-body: "Public Sans"` — body text
+Defined in `@theme` under `index.css`, loaded via Google Fonts import at the top of `index.css`.
+
+### Usage rules
+- **Prefer shadcn/ui primitives** over hand-rolled controls: `Button`, `Card`, `Input`, `Label`, `Badge`, `Select`, `Dialog`, `Alert`, `Skeleton`, `Table`, `Tabs`, `Popover`, `Toast`, `Drawer`.
+- Map each semantic token to Tailwind utilities so `bg-primary`, `text-muted-foreground`, `border-card`, etc. work (`rounded-md` uses `--radius`).
+- **Semantic naming:** use `destructive`, not `red`; `muted`, not `gray`.
+- **Dark mode optional:** variables live on `:root` + `.dark`. Add `.dark` variants only if dark mode is adopted later; keep the app light-first for now.
+- **Accessibility-first:** Radix primitives provide built-in focus traps, ARIA attributes, and keyboard support. Respect contrast (WCAG AA minimum).
+
+### Component customization
+Components live in your codebase — modify directly in `src/presentation/components/ui/`. For one-off styling, override with the `className` prop; for repeated usage, add variants in the component's `buttonVariants`/`cva` block.
 
 ---
 
@@ -197,6 +263,7 @@ Style with **Tailwind utility classes only** — no inline `style={{}}`, no ad-h
 | Hardcoded API URL | Vite proxy `/api` → `localhost:5001` | Config |
 | Storing server data in `useState` | TanStack Query `useQuery` | State |
 | No error handling | `isError` + fallback UI | Errors |
+| Hand-rolling accessible controls | shadcn/ui primitive | UI |
 | Inline styles | Tailwind utility classes | Styling |
 | Importing across layers upward | Respect Presentation → App → Infra → Domain | Architecture |
 
@@ -228,20 +295,24 @@ Style with **Tailwind utility classes only** — no inline `style={{}}`, no ad-h
 - [ ] No `any` in source (`src/**/*.ts`(x))
 - [ ] Component files respect tier line limits
 - [ ] Tailwind utility classes only (no inline styles)
+- [ ] shadcn/ui primitives preferred over hand-rolled controls
 - [ ] No upward layer imports in `src/`
 
 ---
 
 ## REFERENCES
 
-- Code adapted from: [Vercel Agent Skills - React Best Practices](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/AGENTS.md)
+- shadcn/ui (base of our design system): https://ui.shadcn.com
+- shadcn/ui docs mirror: https://ui.shadcn.com/llms.txt
+- Tailwind CSS v4: https://tailwindcss.com/docs
+- Radix UI primitives: https://radix-ui.com
 - React 18: https://react.dev
 - Vite: https://vitejs.dev
 - TanStack Query: https://tanstack.com/query
-- Tailwind CSS v4: https://tailwindcss.com/docs
 - Zustand: https://docs.pmnd.rs/zustand (optional, future cart/auth)
+- Code adapted from: [Vercel Agent Skills - React Best Practices](https://github.com/vercel-labs/agent-skills/blob/main/skills/react-best-practices/AGENTS.md)
 
 ---
 
 ** LAST UPDATE:** 2026-09-26
-** OUTPUT:** React 18 + Vite + TS frontend with TanStack Query, Tailwind v4 design system, and Express/SQLite backend.
+** OUTPUT:** React 18 + Vite + TS frontend with TanStack Query, shadcn/ui-based design system, Tailwind v4, and Express/SQLite backend.
