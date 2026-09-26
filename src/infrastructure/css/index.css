@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,opsz,wght@0,100..1000,300..800;1,100..1000,300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Raleway", ui-serif, Georgia, serif;
+  --font-body: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-forest: #1E3B2C;
+  --color-pine: #284B38;
+  --color-moss: #7A9B6D;
+  --color-honey: #E3A72F;
+  --color-wheat: #F6F1E4;
+  --color-cream: #FBF8F1;
+  --color-soil: #4A3628;
+  --color-leaf: #5B8C5A;
+  --color-clay: #B0653A;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-body);
+    color: var(--color-soil);
+    background-color: var(--color-wheat);
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+  }
+}

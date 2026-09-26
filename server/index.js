@@ -33,8 +33,19 @@ function initDB() {
       description TEXT,
       price INTEGER NOT NULL,
       imageUrl TEXT,
+      category TEXT NOT NULL DEFAULT 'general',
+      wholesale INTEGER NOT NULL DEFAULT 0,
       sellerId INTEGER REFERENCES users(id) ON DELETE CASCADE
     )`);
+    db.all(`PRAGMA table_info(products)`, (_err, rows) => {
+      const cols = (rows || []).map((c) => c.name);
+      if (!cols.includes('category')) {
+        db.run(`ALTER TABLE products ADD COLUMN category TEXT NOT NULL DEFAULT 'general'`);
+      }
+      if (!cols.includes('wholesale')) {
+        db.run(`ALTER TABLE products ADD COLUMN wholesale INTEGER NOT NULL DEFAULT 0`);
+      }
+    });
     db.get(`SELECT COUNT(*) AS cnt FROM users`, (err, row) => {
       if (err) return;
       if (row.cnt === 0) {
@@ -45,15 +56,26 @@ function initDB() {
     db.get(`SELECT COUNT(*) AS cnt FROM products`, (err, row) => {
       if (err) return;
       if (row.cnt === 0) {
-        db.run(`INSERT INTO products (title,description,price,imageUrl,sellerId) VALUES (?,?,?,?,?)`, 
-        ['Organic Rice A', '100% Java organic rice 5 kg', 15000, 'https://dummyimage.com/400x300/000/fff&text=Rice', 1]);
-        db.run(`INSERT INTO products (title,description,price,imageUrl,sellerId) VALUES (?,?,?,?,?)`, 
-        ['Fresh Tilapia', 'Bulk supply, live fish', 6000, 'https://dummyimage.com/400x300/000/fff&text=Tilapia', 1]);
-        db.run(`INSERT INTO products (title,description,price,imageUrl,sellerId) VALUES (?,?,?,?,?)`, 
-        ['Bio-Mulch', 'Organic soil fertilizer 10 kg', 12000, 'https://dummyimage.com/400x300/000/fff&text=Mulch', 1]);
+        seedProducts();
       }
     });
   });
+}
+
+function seedProducts() {
+  const demos = [
+    ['Organic Tomatoes', 'Field-ripened heirloom tomatoes, 1 kg', 25000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Tomatoes', 'vegetables', 1],
+    ['Fresh Strawberries', 'Sweet local strawberries, 250 g', 50000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Strawberries', 'fruits', 1],
+    ['Premium Rice', '100% Java organic rice, 5 kg', 15000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Rice', 'grains', 0],
+    ['Fresh Milk', 'Farm-fresh whole milk, 1 L', 18000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Milk', 'dairy', 0],
+    ['Grass-Fed Eggs', 'Free-range eggs, tray of 12', 22000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Eggs', 'dairy', 1],
+    ['Green Spinach', 'Fresh baby spinach bunch, 200 g', 12000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Spinach', 'vegetables', 0],
+    ['Banana Bunch', 'Ripe plantain bananas, 1 kg', 15000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Bananas', 'fruits', 1],
+    ['Organic Fertilizer', 'Bio-compost soil conditioner, 10 kg', 80000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Fertilizer', 'supplies', 1],
+  ];
+  const stmt = db.prepare(`INSERT INTO products (title,description,price,imageUrl,category,wholesale,sellerId) VALUES (?,?,?,?,?,?,?)`);
+  demos.forEach((d) => stmt.run(...d));
+  stmt.finalize(() => console.log('Seeded 8 demo products.'));
 }
 
 initDB();
@@ -67,7 +89,7 @@ app.get('/api/auth/login', (req, res) => {
 });
 
 app.get('/api/products', (req, res) => {
-  db.all(`SELECT p.id, p.title, p.description, p.price, p.imageUrl, p.sellerId
+  db.all(`SELECT p.id, p.title, p.description, p.price, p.imageUrl, p.category, p.wholesale
           FROM products p`, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     const products = rows.map(r => ({
@@ -76,8 +98,8 @@ app.get('/api/products', (req, res) => {
       description: r.description,
       price: r.price,
       imageUrl: r.imageUrl,
-      sellerName: 'Demo Seller',
-      category: 'Demo'
+      category: r.category,
+      wholesale: Boolean(r.wholesale),
     }));
     res.json({ count: products.length, products });
   });
