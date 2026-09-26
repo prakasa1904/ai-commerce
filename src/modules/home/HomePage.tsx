@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import type { ProductCategory } from '../../domain/types/product';
-import Hero from './-Hero';
+import Hero from './Hero';
 import GridViewCategory from '../../presentation/components/molecules/GridViewCategory';
 import GridViewProduct from '../../presentation/components/molecules/GridViewProduct';
-import SubscriptionBand from './-SubscriptionBand';
+import SubscriptionBand from './SubscriptionBand';
 
 const HomePage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<ProductCategory | 'all'>('all');

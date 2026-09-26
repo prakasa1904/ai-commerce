@@ -40,18 +40,24 @@ Production-grade marketplace: React + Vite + TypeScript frontend, Express + SQLi
 
 ```
 Presentation --> Application --> Infrastructure --> Domain
-  (ui/ atoms/  (hooks/    (api/            (types/
-   molecules/    services/   cache/        Product,
-   routes/)      providers/)  css/)         ProductCategory,
-                                            ProductApiResponse)
+  (modules/     (hooks/    (api/            (types/
+   routeTree)     services/   cache/        Product,
+                  providers/)  css/)         ProductCategory,
+                                             ProductApiResponse)
 ```
+
+### Modules (domain page groups)
+- Each domain module lives in `src/modules/<module>/` with its page components. `cart/` and `checkout/` are reserved for future modules.
+- `modules/home/` (Hero, SubscriptionBand, HomePage) ← `/` route; `modules/category/` (CategoryListPage, CategoryDetailPage) ← `/cat` and `/cat/<id>`; `modules/product/` (ProductDetailPage) ← `/det/<catId>/<productId>`.
+- Routes stay thin in `src/routes/` (only `createFileRoute` + param guards); they import page modules from `src/modules/`. TanStack plugin only scans `src/routes/`, so `modules/` files need no `-` prefix.
+- **Dependency Rule:** Presentation modules may import Presentation (ui/atoms/molecules), Application, Infrastructure, Domain. Never import Application/Infrastructure/Domain from Presentation.
 
 ### Routing
 
 - TanStack `@tanstack/router-plugin` generates `src/routeTree.gen.ts` from `src/routes/`.
 - File routes, grouped by domain folder: `index.tsx`(`/`, home), `cat/index.tsx` (`/cat`, all categories + product grid/list), `cat/$categoryID.tsx` (`/cat/<id>`, single category + product grid/list), `det/$categoryID.$productID.tsx` (`/det/<catId>/<productId>`, product detail). Dot-files = nested segments.
 - `__root.tsx` is a pathless layout: **`createRootRoute`** (Header/Footer/Outlet + `notFoundComponent`).
-- Page modules that are NOT routes live in `-`-prefixed sibling folders so the generator ignores them (e.g. `routes/home/-Hero.tsx`); `src/router.tsx` builds the router from the generated tree.
+- Page logic lives in `src/modules/`; route files contain only `createFileRoute` + param guards.
 - Invalid `$categoryID`/`$productID` render the shared `NotFoundPage` atom.
 
 ## How to Run
@@ -90,6 +96,12 @@ src/
 │   ├── api/productApi.ts      # fetch('/api/products')
 │   ├── cache/queryKeys.ts
 │   └── css/index.css          # shadcn/ui tokens + Tailwind v4 @theme/@layer base
+├── modules/
+│   ├── home/                   # HomePage, Hero, SubscriptionBand (← /)
+│   ├── category/               # CategoryListPage, CategoryDetailPage (← /cat, /cat/$id)
+│   ├── product/                # ProductDetailPage (← /det/$catId/$productId)
+│   ├── cart/                   # reserved
+│   └── checkout/               # reserved
 ├── routes/                    # File-based routes (see Routing above)
 ├── presentation/components/
 │   ├── ui/                    # Local shadcn/ui primitives (modify directly)
@@ -109,7 +121,7 @@ server/
 
 ### Layers & rendering
 - **Dependency Rule:** lower layers never import upward. Never import a Presentation file from Application/Infrastructure.
-- Page/module code lives in `src/routes/`. `presentation/` holds only shared components (`ui/`, `atoms/`, `molecules/`).
+- Page/module code lives in `src/modules/` (one folder per domain module); `src/routes/` holds only route definitions. `presentation/` holds only shared components (`ui/`, `atoms/`, `molecules/`).
 - Build UI from **shadcn/ui primitives first** (`Button`, `Card`, `Input`, `Badge`, `Dialog`, `Alert`), then compose into atoms/molecules. Never re-implement an existing primitive. Modify primitives directly in `src/presentation/components/ui/`; add `cva` variants for repeated use.
 - Prefer semantic naming (`destructive`, not `red`); Tailwind utility classes only (no inline styles).
 
