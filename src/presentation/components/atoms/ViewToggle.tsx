@@ -13,7 +13,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ view, onChange }) => {
     <button
       type="button"
       onClick={() => onChange(v)}
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all ${view === v ? 'bg-forest text-cream shadow-sm' : 'bg-cream text-soil/70 hover:text-forest hover:border-moss/50 hover:border'}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-2 focus-visible:outline-forest focus-visible:outline-offset-2 ${view === v ? 'bg-forest text-cream shadow-sm' : 'bg-cream text-soil/70 hover:text-forest hover:border-moss/50 hover:border'}`}
       aria-pressed={view === v}
     >
       {icon}

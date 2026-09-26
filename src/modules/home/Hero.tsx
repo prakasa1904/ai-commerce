@@ -1,24 +1,114 @@
 import React from 'react';
+import { useProducts } from '../../application/hooks/useProducts';
+import { formatPrice, unitOf } from '../product/productUtils';
+import BrandSeal from '../../presentation/components/atoms/BrandSeal';
 
-const Hero: React.FC = () => (
-  <section id="top" className="relative overflow-hidden pt-20 pb-16 px-4">
-    <div className="max-w-7xl mx-auto text-center relative">
-      <p className="font-display text-honey font-bold text-sm tracking-[0.3em] uppercase">Dawn to doorstep</p>
-      <h1 className="mt-4 text-5xl sm:text-6xl md:text-7xl font-black text-forest leading-[1.05] font-display">
-        Fresh picked,&nbsp;
-        <span className="block text-pine/90">straight to your kitchen</span>
-      </h1>
-      <p className="mt-6 text-lg text-soil/80 max-w-2xl mx-auto">
-        Seasonal vegetables, fruits, grains and dairy from local farmers — harvested at first light and delivered the same day.
-      </p>
-      <div className="mt-8 flex items-center justify-center gap-4">
-        <a href="#products" className="bg-forest hover:bg-pine text-cream font-bold px-8 py-3 rounded-full transition-colors shadow-sm">Shop fresh produce</a>
-        <a href="#subscriptions" className="border-2 border-forest/50 text-forest font-bold px-8 py-3 rounded-full hover:border-honey/60 hover:text-honey transition-colors">Subscribe &amp; save 15%</a>
+const Hero: React.FC = () => {
+  const { data: products } = useProducts();
+
+  const today = products?.slice(0, 3) ?? [
+    { title: 'Roma tomatoes', price: 12000, category: 'vegetables' as const, id: 1, imageUrl: null, description: 'Fresh bunch', wholesale: false },
+    { title: 'Basmati rice', price: 32000, category: 'grains' as const, id: 2, imageUrl: null, description: '1 kg', wholesale: false },
+    { title: 'Free-range eggs', price: 45000, category: 'dairy' as const, id: 3, imageUrl: null, description: '1 tray', wholesale: false },
+  ];
+
+  const crateTotal = today.reduce((sum, p) => sum + p.price, 0);
+
+  return (
+    <section
+      id="top"
+      aria-label="Today's harvest"
+      className="relative overflow-hidden bg-forest"
+      style={{
+        backgroundImage:
+          'linear-gradient(rgba(31,59,44,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(31,59,44,0.18) 1px, transparent 1px)',
+        backgroundSize: '100% 44px, 44px 100%',
+      }}
+    >
+      <div className="absolute inset-0 -z-10">
+        <div
+          aria-hidden="true"
+          className="absolute top-0 left-0 h-96 w-full bg-pine/40"
+          style={{ background: 'radial-gradient(900px 320px at 85% 0%, rgba(255, 167, 47, 0.16), transparent 55%)' }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute bottom-0 right-0 h-96 w-full"
+          style={{ background: 'radial-gradient(800px 340px at 10% 100%, rgba(122, 155, 109, 0.22), transparent 55%)' }}
+        />
       </div>
-    </div>
-    <div className="absolute -top-16 -right-20 w-72 h-72 bg-moss/20 rounded-full blur-2xl pointer-events-none" aria-hidden="true" />
-    <div className="absolute -bottom-20 -left-12 w-56 h-56 bg-honey/20 rounded-full blur-2xl pointer-events-none" aria-hidden="true" />
-  </section>
-);
+
+      <div className="relative max-w-7xl mx-auto px-4 py-20 lg:py-28">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div className="lg:col-span-7 text-center lg:text-left">
+            <BrandSeal />
+            <p className="mt-6 font-display text-honey font-bold text-sm tracking-[0.35em] uppercase">Picked at dawn</p>
+            <h1 className="mt-4 text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] text-cream font-display">
+              Today's harvest,
+              <span className="block text-honey">written up &amp; sealed.</span>
+            </h1>
+            <p className="mt-6 text-lg text-cream/80 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Seven stalls, one crate. From the field to your table the same afternoon — no middlemen, no early-morning
+              alarms.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center justify-center lg:justify-start gap-4">
+              <a
+                href="#products"
+                className="bg-honey hover:bg-[#d98f1a] text-forest font-bold px-9 py-3.5 rounded-full transition-colors shadow-lg"
+              >
+                See today's stalls
+              </a>
+              <a
+                href="#subscriptions"
+                className="border-2 border-moss/50 text-cream font-bold px-9 py-3.5 rounded-full hover:border-honey hover:text-honey transition-colors"
+              >
+                Subscribe &amp; save 15%
+              </a>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 relative">
+            <div
+              aria-hidden="true"
+              className="absolute -inset-6 -z-0 bg-forest rounded-[32px] rotate-1 shadow-2xl border border-moss/20"
+            />
+            <div className="relative bg-wheat rounded-[32px] border border-[#E7D9AE]/60 p-6 lg:p-8 shadow-2xl">
+              <div className="border-b-2 border-[#E7D9AE]/60 pb-4 mb-4 flex items-baseline justify-between gap-4">
+                <span className="font-display font-black text-[10px] tracking-[0.35em] uppercase text-soil">Harvest ticket</span>
+                <span className="font-display text-[10px] tracking-[0.2em] uppercase text-clay/80">Same-day</span>
+              </div>
+              <ul className="space-y-3.5">
+                {today.map((product) => (
+                  <li key={product.id} className="flex items-baseline justify-between gap-4">
+                    <span className="flex items-baseline gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-honey shadow-[0_0_6px_rgba(227,167,47,0.9)]"
+                      />
+                      <span className="font-display font-semibold text-sm text-forest tracking-tight">{product.title}</span>
+                    </span>
+                    <span className="font-display font-black text-base text-clay tabular-nums tracking-tight">
+                      {formatPrice(product.price)} / {unitOf(product.description)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 flex items-center justify-between border-t border-[#E7D9AE]/60 pt-4">
+                <span className="font-display text-[10px] uppercase tracking-[0.25em] text-soil/80">
+                  Total for one crate
+                </span>
+                <span className="font-display font-black text-lg text-forest">{formatPrice(crateTotal)}</span>
+              </div>
+            </div>
+            <div
+              aria-hidden="true"
+              className="absolute -bottom-6 -left-6 h-20 w-20 bg-moss/90 rounded-full blur-2xl"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default Hero;

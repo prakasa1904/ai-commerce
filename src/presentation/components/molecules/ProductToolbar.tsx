@@ -22,7 +22,7 @@ const ProductToolbar: React.FC<ProductToolbarProps> = ({
   <div className="flex flex-col sm:flex-row gap-3 mb-8">
     <Input type="text" placeholder="Search tomatoes, rice, eggs…" value={searchQuery}
       onChange={(e) => onSearchChange(e.target.value)}
-      className="flex-1 rounded-full bg-card border-wheat/80 text-soil placeholder-soil/40" />
+      className="flex-1 rounded-full bg-card border-wheat/80 text-soil placeholder-soil/40 focus-visible:outline-2 focus-visible:outline-forest focus-visible:outline-offset-2" />
     <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
       <ViewToggle view={view} onChange={onViewChange} />
       <Pill label="All" active={activeCategory === 'all'} onClick={() => onCategoryChange('all')} />
