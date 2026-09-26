@@ -49,10 +49,10 @@ Presentation --> Application --> Infrastructure --> Domain
 ### Routing
 
 - TanStack `@tanstack/router-plugin` generates `src/routeTree.gen.ts` from `src/routes/`.
-- File routes: `index.tsx`(`/`), `category.tsx`(`/category`), `cat.$categoryId.tsx` (`/cat/<id>`), `det.$categoryId.$productId.tsx` (`/det/<catId>/<productId>`). Dot-files = nested segments.
+- File routes, grouped by domain folder: `index.tsx`(`/`, home), `cat/index.tsx` (`/cat`, all categories + product grid/list), `cat/$categoryID.tsx` (`/cat/<id>`, single category + product grid/list), `det/$categoryID.$productID.tsx` (`/det/<catId>/<productId>`, product detail). Dot-files = nested segments.
 - `__root.tsx` is a pathless layout: **`createRootRoute`** (Header/Footer/Outlet + `notFoundComponent`).
 - Page modules that are NOT routes live in `-`-prefixed sibling folders so the generator ignores them (e.g. `routes/home/-Hero.tsx`); `src/router.tsx` builds the router from the generated tree.
-- Invalid `$categoryId`/`$productId` render the shared `NotFoundPage` atom.
+- Invalid `$categoryID`/`$productID` render the shared `NotFoundPage` atom.
 
 ## How to Run
 

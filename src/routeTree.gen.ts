@@ -10,69 +10,68 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CategoryRouteImport } from './routes/category'
-import { Route as CatCategoryIdRouteImport } from './routes/cat.$categoryId'
-import { Route as DetCategoryIdProductIdRouteImport } from './routes/det.$categoryId.$productId'
+import { Route as CatIndexRouteImport } from './routes/cat/index'
+import { Route as CatCategoryIDRouteImport } from './routes/cat/$categoryID'
+import { Route as DetCategoryIDProductIDRouteImport } from './routes/det/$categoryID.$productID'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CategoryRoute = CategoryRouteImport.update({
-  id: '/category',
-  path: '/category',
+const CatIndexRoute = CatIndexRouteImport.update({
+  id: '/cat/',
+  path: '/cat/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatCategoryIdRoute = CatCategoryIdRouteImport.update({
-  id: '/cat/$categoryId',
-  path: '/cat/$categoryId',
+const CatCategoryIDRoute = CatCategoryIDRouteImport.update({
+  id: '/cat/$categoryID',
+  path: '/cat/$categoryID',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DetCategoryIdProductIdRoute = DetCategoryIdProductIdRouteImport.update({
-  id: '/det/$categoryId/$productId',
-  path: '/det/$categoryId/$productId',
+const DetCategoryIDProductIDRoute = DetCategoryIDProductIDRouteImport.update({
+  id: '/det/$categoryID/$productID',
+  path: '/det/$categoryID/$productID',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/category': typeof CategoryRoute
-  '/cat/$categoryId': typeof CatCategoryIdRoute
-  '/det/$categoryId/$productId': typeof DetCategoryIdProductIdRoute
+  '/cat/$categoryID': typeof CatCategoryIDRoute
+  '/cat/': typeof CatIndexRoute
+  '/det/$categoryID/$productID': typeof DetCategoryIDProductIDRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/category': typeof CategoryRoute
-  '/cat/$categoryId': typeof CatCategoryIdRoute
-  '/det/$categoryId/$productId': typeof DetCategoryIdProductIdRoute
+  '/cat/$categoryID': typeof CatCategoryIDRoute
+  '/cat': typeof CatIndexRoute
+  '/det/$categoryID/$productID': typeof DetCategoryIDProductIDRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/category': typeof CategoryRoute
-  '/cat/$categoryId': typeof CatCategoryIdRoute
-  '/det/$categoryId/$productId': typeof DetCategoryIdProductIdRoute
+  '/cat/$categoryID': typeof CatCategoryIDRoute
+  '/cat/': typeof CatIndexRoute
+  '/det/$categoryID/$productID': typeof DetCategoryIDProductIDRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    '/' | '/category' | '/cat/$categoryId' | '/det/$categoryId/$productId'
+  fullPaths: '/' | '/cat/$categoryID' | '/cat/' | '/det/$categoryID/$productID'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/category' | '/cat/$categoryId' | '/det/$categoryId/$productId'
+  to: '/' | '/cat/$categoryID' | '/cat' | '/det/$categoryID/$productID'
   id:
     | '__root__'
     | '/'
-    | '/category'
-    | '/cat/$categoryId'
-    | '/det/$categoryId/$productId'
+    | '/cat/$categoryID'
+    | '/cat/'
+    | '/det/$categoryID/$productID'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CategoryRoute: typeof CategoryRoute
-  CatCategoryIdRoute: typeof CatCategoryIdRoute
-  DetCategoryIdProductIdRoute: typeof DetCategoryIdProductIdRoute
+  CatCategoryIDRoute: typeof CatCategoryIDRoute
+  CatIndexRoute: typeof CatIndexRoute
+  DetCategoryIDProductIDRoute: typeof DetCategoryIDProductIDRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -84,25 +83,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/category': {
-      id: '/category'
-      path: '/category'
-      fullPath: '/category'
-      preLoaderRoute: typeof CategoryRouteImport
+    '/cat/': {
+      id: '/cat/'
+      path: '/cat'
+      fullPath: '/cat/'
+      preLoaderRoute: typeof CatIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cat/$categoryId': {
-      id: '/cat/$categoryId'
-      path: '/cat/$categoryId'
-      fullPath: '/cat/$categoryId'
-      preLoaderRoute: typeof CatCategoryIdRouteImport
+    '/cat/$categoryID': {
+      id: '/cat/$categoryID'
+      path: '/cat/$categoryID'
+      fullPath: '/cat/$categoryID'
+      preLoaderRoute: typeof CatCategoryIDRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/det/$categoryId/$productId': {
-      id: '/det/$categoryId/$productId'
-      path: '/det/$categoryId/$productId'
-      fullPath: '/det/$categoryId/$productId'
-      preLoaderRoute: typeof DetCategoryIdProductIdRouteImport
+    '/det/$categoryID/$productID': {
+      id: '/det/$categoryID/$productID'
+      path: '/det/$categoryID/$productID'
+      fullPath: '/det/$categoryID/$productID'
+      preLoaderRoute: typeof DetCategoryIDProductIDRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -110,9 +109,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CategoryRoute: CategoryRoute,
-  CatCategoryIdRoute: CatCategoryIdRoute,
-  DetCategoryIdProductIdRoute: DetCategoryIdProductIdRoute,
+  CatCategoryIDRoute: CatCategoryIDRoute,
+  CatIndexRoute: CatIndexRoute,
+  DetCategoryIDProductIDRoute: DetCategoryIDProductIDRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

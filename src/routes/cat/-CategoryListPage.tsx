@@ -16,7 +16,7 @@ const CategoryPage: React.FC = () => {
         <GridViewCategory
           onSelect={(link) => {
             if (link !== 'all') {
-              void router.navigate({ to: '/cat/$categoryId', params: { categoryId: link } });
+              void router.navigate({ to: '/cat/$categoryID', params: { categoryID: link } });
             }
           }}
         />

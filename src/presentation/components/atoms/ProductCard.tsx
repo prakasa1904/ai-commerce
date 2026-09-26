@@ -11,8 +11,8 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <Card className="group relative bg-card border-wheat/60 overflow-hidden hover:border-moss/40 shadow-sm hover:shadow-lg transition-all h-full flex flex-col">
       <Link
-        to="/det/$categoryId/$productId"
-        params={{ categoryId: product.category, productId: product.id.toString() }}
+        to="/det/$categoryID/$productID"
+        params={{ categoryID: product.category, productID: product.id.toString() }}
         aria-label={`View ${product.title}`}
         className="block"
       >
