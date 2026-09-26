@@ -7,6 +7,16 @@ export type ProductCategory =
   | 'organic'
   | 'supplies';
 
+export const ALL_CATEGORIES: readonly ProductCategory[] = [
+  'vegetables',
+  'fruits',
+  'grains',
+  'dairy',
+  'livestock',
+  'organic',
+  'supplies',
+];
+
 export type Product = {
   id: number;
   title: string;

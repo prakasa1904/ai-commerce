@@ -13,7 +13,9 @@ Build a production-grade web marketplace with React + Vite + TypeScript and an E
 | UI/UX System | shadcn/ui (Radix UI primitives) — design tokens in `src/infrastructure/css/` |
 | Styling | Tailwind CSS v4 |
 | Server State | TanStack Query v5 (`@tanstack/react-query`) |
+| Routing | TanStack Router v1 (`@tanstack/react-router`) file-based routes in `src/routes/` |
 | Backend | Express 4, SQLite3 |
+| Build | `tsc && vite build` |
 | Build | `tsc && vite build` |
 
 ---
@@ -24,12 +26,12 @@ Build a production-grade web marketplace with React + Vite + TypeScript and an E
 flowchart LR
     subgraph client["Browser — Vite dev :5173"]
         direction TB
-        UI["presentation/ — ui/ atoms/ molecules/ templates/ (shadcn/ui, Tailwind)"]
+        UI["presentation/ — ui/ atoms/ molecules/ (shadcn/ui, Tailwind)"]
         APP["main.tsx · App.tsx<br/>DataProvider (TanStack Query)"]
         UI --> APP
     end
 
-    subgraph dev["Vite dev proxy — vite.config.ts"]
+    subgraph dev["Vite dev proxy — vite.config.js"]
         P["GET /api/* → http://localhost:5001"]
     end
 
@@ -49,8 +51,8 @@ flowchart LR
 ```mermaid
 flowchart LR
     A["main.tsx"] -->|wraps| B["App"]
-    B --> C["HomePage"]
-    C --> D["GridViewProduct"]
+    B -->|RouterProvider renders| C["routes/index.tsx → HomePage"]
+    C -->|assembles| D["Hero + GridViewCategory + GridViewProduct + SubscriptionBand"]
     D -->|consumes| E["useProducts"]
     E -->|calls| F["productService"]
     F -->|calls| G["productApi"]
@@ -65,14 +67,14 @@ flowchart LR
 
 **Layer sequence (a request lifecycle):**
 1. `DataProvider` (`QueryClientProvider`) wraps the app tree — every query goes through the shared `queryClient` with `staleTime`/`gcTime`/`retry` defaults.
-2. `App` renders the `HomePage` template, which assembles `Header`, `Hero`, `GridViewCategory`, `GridViewProduct`, `SubscriptionBand`, `Footer`.
+2. `App` renders the `RouterProvider`, which renders the matched `src/routes/` file route; the home route (`index.tsx`) renders the page module, which assembles `Header`, `Hero`, `GridViewCategory`, `GridViewProduct`, `SubscriptionBand`, `Footer`.
 3. `GridViewProduct` calls `useProducts()` (Presentation → Application hook).
 4. `useProducts` calls `productService.getProducts()` (Application → Application service).
 5. `productService` calls `productApi.fetchProducts()` (Application → Infrastructure/fetch).
 6. `productApi` calls `GET /api/products` and maps the response into typed `Product` domain objects.
 
 ### Component rendering rules
-- **Every molecule renders the primitives it needs.** Build UI out of **shadcn/ui primitives first** (`ui/Button`, `ui/Card`, `ui/Input`, `ui/Badge`, `ui/Alert`), then compose them into atoms/molecules/templates. `GridViewProduct` and `ProductCard` are composed from primitives — do not re-implement an already-existing primitive in Presentation.
+- **Every molecule renders the primitives it needs.** Build UI out of **shadcn/ui primitives first** (`ui/Button`, `ui/Card`, `ui/Input`, `ui/Badge`, `ui/Alert`), then compose them into atoms/molecules/page modules. `GridViewProduct` and `ProductCard` are composed from primitives — do not re-implement an already-existing primitive in Presentation.
 
 ---
 
@@ -81,7 +83,7 @@ flowchart LR
 ```
 src/
 ├── main.tsx                    # ReactDOM render + DataProvider wrap + CSS import
-├── App.tsx                     # Root component (renders HomePage)
+├── App.tsx                     # Root component (renders RouterProvider)
 ├── vite-env.d.ts               # CSS module declarations
 ├── domain/
 │   └── types/
@@ -100,15 +102,23 @@ src/
 │   │   └── queryKeys.ts        # query key factory
 │   └── css/
 │       └── index.css           # shadcn/ui tokens (@layer base vars) + Tailwind v4 @theme
+├── routes/
+│   ├── __root.tsx              # root layout (Header/Footer/Outlet) + notFoundComponent
+│   ├── index.tsx               # `/` home (Hero, GridViewCategory, GridViewProduct, SubscriptionBand)
+│   ├── category.tsx            # `/category` browsing page
+│   ├── cat.$categoryId.tsx     # `/cat/$categoryId` category detail
+│   ├── det.$categoryId.$productId.tsx # `/det/$categoryId/$productId` product detail
+│   └── home/, cat/, det/, category/   # page module subcomponents (-prefixed, ignored by generator)
 └── presentation/
     └── components/
         ├── ui/                 # shadcn/ui primitives (Button, Card, Input, Badge, Alert, Dialog)
-        ├── atoms/              # Header, BrandWordmark, Pill, ProductCard (leaf/sun brand mark)
-        ├── molecules/          # GridViewCategory, GridViewProduct
-        └── templates/          # Hero, SubscriptionBand, Footer, homePage
+        ├── atoms/              # Header, BrandWordmark, Pill, ProductCard (leaf/sun), NotFoundPage
+        └── molecules/          # GridViewProduct, GridViewCategory, ProductList, ProductToolbar
 ```
 
 The `ui/` folder holds our local copies of shadcn/ui primitives — modify them directly there.
+
+**File routing (`src/routes/`):** TanStack file-based routing (`@tanstack/router-plugin` generates `src/routeTree.gen.ts`). Route files export a `Route` via `createFileRoute`. Dot-files map to nested path segments: `cat.$categoryId.tsx` → `/cat/$categoryId`, `det.$categoryId.$productId.tsx` → `/det/$categoryId/$productId`. Subfolder page modules are prefixed with `-` so the generator ignores them as routes (e.g. `routes/home/-Hero.tsx`). `src/router.tsx` builds the router from the generated tree. Invalid `$categoryId`/`$productId` render the shared `NotFoundPage` atom (also the root `notFoundComponent`).
 
 **Dependency Rule:** Lower layers MUST NOT import upper layers.
 
@@ -136,10 +146,11 @@ Every boundary holds today:
 Follow the folder layout above. When adding a feature, place it in the correct layer first, then wire through the boundaries. Never import a Presentation file from Application/Infrastructure.
 
 ### Step 3: Component Design
-- **Maximum 50 lines** per component (templates ≤ 50, molecules ≤ 80 with sub-components)
+- **Maximum 50 lines** per component (routes ≤ 50, modules ≤ 80 with sub-components)
 - Extract sub-components when logic > 20 lines
 - Single Responsibility Principle (one component = one job)
-- Build UI from **shadcn/ui primitives first** (`<Button>`, `<Card>`, `<Input>`, `<Badge>`, `<Dialog>`), then compose into atoms/molecules/templates. Do not re-implement an already-existing primitive.
+- Build UI from **shadcn/ui primitives first** (`<Button>`, `<Card>`, `<Input>`, `<Badge>`, `<Dialog>`), then compose into atoms/molecules/page modules. Do not re-implement an already-existing primitive.
+- Page/module code lives in `routes/` (TanStack file-based routing). `presentation/` holds only shared components (`ui/ atoms/ molecules/`).
 
 ### Step 4: State Management
 - **Local State:** `useState` for form inputs, loading flags, UI toggles (`searchQuery` in `GridViewProduct`)
@@ -191,9 +202,10 @@ it('calls handler when clicked', () => {
 ### Step 9: Component Complexity Tiers
 | Tier | Max Lines | Example |
 |------|-----------|---------|
+| Route | ≤50 | `/`, `/cat/$categoryId` |
+| Page module | ≤80 | home, category, product detail |
 | Atom | ≤20 | `<Header>`, `<Pill>` |
 | Molecule | ≤80 | `<GridViewCategory>`, `<GridViewProduct>` (with sub-components) |
-| Template | ≤50 | `<Hero>`, `<SubscriptionBand>`, `<Footer>` |
 | Page | ≤80 | `<HomePage>` |
 
 ---

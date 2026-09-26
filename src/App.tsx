@@ -1,5 +1,6 @@
-import HomePage from './presentation/components/templates/homePage';
+import { RouterProvider } from '@tanstack/react-router';
+import { router } from './router';
 
 export default function App() {
-  return <HomePage />;
+  return <RouterProvider router={router} />;
 }
