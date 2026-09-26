@@ -8,3 +8,6 @@ build/
 
 # TanStack Router generated cache
 .tanstack/
+
+# Local SQLite data (recreate with `npm run seed`)
+farmer_marketplace.db

@@ -1,12 +1,12 @@
-const sqlite3 = require('sqlite3').verbose();
-require('dotenv').config();
+import pkg from 'sqlite3';
+import 'dotenv/config';
 
-// DB path fallback if .env not set
-const dbPath = process.env.DB_PATH || 'farm.db';
-const db = new sqlite3.Database(dbPath);
+const { Database } = pkg;
+
+const dbPath = process.env.DB_PATH || 'farmer_marketplace.db';
+const db = new Database(dbPath);
 
 db.serialize(() => {
-  // Create tables if they don't exist (copies initDB logic)
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -21,79 +21,38 @@ db.serialize(() => {
     description TEXT,
     price INTEGER NOT NULL,
     imageUrl TEXT,
+    category TEXT NOT NULL DEFAULT 'general',
+    wholesale INTEGER NOT NULL DEFAULT 0,
     sellerId INTEGER REFERENCES users(id) ON DELETE CASCADE
   );`);
 
-  // Seed demo products **only** if table is empty
   db.get(`SELECT COUNT(*) as cnt FROM products`, (err, row) => {
     if (err) return console.error('DB error:', err);
-    if (row.cnt > 0) return console.log('Products already seeded.');
+    if (row.cnt > 0) return console.log(`Products already seeded (${row.cnt} rows).`);
 
     console.log('Seeding demo products...');
 
-    const demoProducts = [
-      {
-        title: 'Organic Rice A',
-        description: '100% Java organic rice 5 kg',
-        price: 15000,
-        imageUrl: 'https://dummyimage.com/400x300/000/fff&text=Rice',
-        sellerId: 1 // dummy seller – row will be created below
-      },
-      {
-        title: 'Fresh Tilapia',
-        description: 'Bulk supply, live fish',
-        price: 6000,
-        imageUrl: 'https://dummyimage.com/400x300/000/fff&text=Tilapia',
-        sellerId: 1
-      },
-      {
-        title: 'Bio-Mulch',
-        description: 'Organic soil fertilizer 10 kg',
-        price: 12000,
-        imageUrl: 'https://dummyimage.com/400x300/000/fff&text=Mulch',
-        sellerId: 1
-      },
+    const demos = [
+      ['Organic Tomatoes', 'Field-ripened heirloom tomatoes, 1 kg', 25000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Tomatoes', 'vegetables', 1],
+      ['Fresh Strawberries', 'Sweet local strawberries, 250 g', 50000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Strawberries', 'fruits', 1],
+      ['Premium Rice', '100% Java organic rice, 5 kg', 15000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Rice', 'grains', 0],
+      ['Fresh Milk', 'Farm-fresh whole milk, 1 L', 18000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Milk', 'dairy', 0],
+      ['Grass-Fed Eggs', 'Free-range eggs, tray of 12', 22000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Eggs', 'dairy', 1],
+      ['Green Spinach', 'Fresh baby spinach bunch, 200 g', 12000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Spinach', 'vegetables', 0],
+      ['Banana Bunch', 'Ripe plantain bananas, 1 kg', 15000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Bananas', 'fruits', 1],
+      ['Organic Fertilizer', 'Bio-compost soil conditioner, 10 kg', 80000, 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Fertilizer', 'supplies', 1],
     ];
 
-    // Create a dummy seller if users table empty
-    db.get(`SELECT COUNT(*) as cnt FROM users`, (err, row) => {
+    db.get(`SELECT id FROM users WHERE role='seller' LIMIT 1`, (err, row) => {
       if (err) return console.error('DB error:', err);
-      if (row.cnt === 0) {
-        db.run(`INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)`,
-          ['Demo Seller', 'seller@example.com', 'demo123', 'seller'],
-          function (err) {
-            if (err) return console.error('Seed user error:', err);
-            console.log('Demo seller created with ID', this.lastID);
-            demoProducts.forEach(p => p.sellerId = this.lastID);
-            insertProducts(demoProducts);
-          });
-      } else {
-        // use first user as seller
-        db.get(`SELECT id FROM users LIMIT 1`, (err, row) => {
-          if (err) return console.error('DB error:', err);
-          demoProducts.forEach(p => p.sellerId = row.id);
-          insertProducts(demoProducts);
-        });
-      }
+      const sellerId = row ? row.id : 1;
+      const stmt = db.prepare(`INSERT INTO products (title,description,price,imageUrl,category,wholesale,sellerId) VALUES (?,?,?,?,?,?,?)`);
+      demos.forEach((d) => stmt.run(...d.concat(sellerId)));
+      stmt.finalize((err) => {
+        if (err) return console.error('Seed error:', err);
+        console.log(`Demo products seeded (${demos.length} rows).`);
+        db.close();
+      });
     });
-
-    const insertProducts = (items) => {
-      const stmt = db.prepare(`INSERT INTO products (title,description,price,imageUrl,sellerId) VALUES (?,?,?,?,?)`);
-      for (const item of items) {
-        stmt.run(
-          item.title,
-          item.description,
-          item.price,
-          item.imageUrl,
-          item.sellerId,
-          function (err) {
-            if (err) return console.error('Seed product error:', err);
-            console.log('Inserted product ID', this.lastID);
-          }
-        );
-      }
-      stmt.finalize();
-      console.log('Demo products seeded.');
-    };
   });
 });

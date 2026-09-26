@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, AnyRoute } from '@tanstack/react-router';
+import { createRootRoute, Outlet } from '@tanstack/react-router';
 import Header from '../presentation/components/atoms/Header';
 import Footer from '../presentation/components/atoms/Footer';
 
@@ -12,6 +12,6 @@ const RootLayout = () => (
   </div>
 );
 
-export const Route = createFileRoute('/')({
+export const Route = createRootRoute({
   component: RootLayout,
-}) as AnyRoute;
+});
