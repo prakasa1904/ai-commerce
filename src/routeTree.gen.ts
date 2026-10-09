@@ -10,13 +10,39 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminProductsRouteImport } from './routes/admin/products'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as CatIndexRouteImport } from './routes/cat/index'
 import { Route as CatCategoryIDRouteImport } from './routes/cat/$categoryID'
+import { Route as AdminShopsIndexRouteImport } from './routes/admin/shops/index'
+import { Route as AdminShopsShopIdRouteImport } from './routes/admin/shops/$shopId'
 import { Route as DetCategoryIDProductIDRouteImport } from './routes/det/$categoryID.$productID'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/admin/products',
+  path: '/admin/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatIndexRoute = CatIndexRouteImport.update({
@@ -29,6 +55,16 @@ const CatCategoryIDRoute = CatCategoryIDRouteImport.update({
   path: '/cat/$categoryID',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminShopsIndexRoute = AdminShopsIndexRouteImport.update({
+  id: '/admin/shops/',
+  path: '/admin/shops/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminShopsShopIdRoute = AdminShopsShopIdRouteImport.update({
+  id: '/admin/shops/$shopId',
+  path: '/admin/shops/$shopId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DetCategoryIDProductIDRoute = DetCategoryIDProductIDRouteImport.update({
   id: '/det/$categoryID/$productID',
   path: '/det/$categoryID/$productID',
@@ -37,41 +73,91 @@ const DetCategoryIDProductIDRoute = DetCategoryIDProductIDRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/cat/$categoryID': typeof CatCategoryIDRoute
+  '/admin/': typeof AdminIndexRoute
   '/cat/': typeof CatIndexRoute
+  '/admin/shops/$shopId': typeof AdminShopsShopIdRoute
   '/det/$categoryID/$productID': typeof DetCategoryIDProductIDRoute
+  '/admin/shops/': typeof AdminShopsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/cat/$categoryID': typeof CatCategoryIDRoute
+  '/admin': typeof AdminIndexRoute
   '/cat': typeof CatIndexRoute
+  '/admin/shops/$shopId': typeof AdminShopsShopIdRoute
   '/det/$categoryID/$productID': typeof DetCategoryIDProductIDRoute
+  '/admin/shops': typeof AdminShopsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/cat/$categoryID': typeof CatCategoryIDRoute
+  '/admin/': typeof AdminIndexRoute
   '/cat/': typeof CatIndexRoute
+  '/admin/shops/$shopId': typeof AdminShopsShopIdRoute
   '/det/$categoryID/$productID': typeof DetCategoryIDProductIDRoute
+  '/admin/shops/': typeof AdminShopsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cat/$categoryID' | '/cat/' | '/det/$categoryID/$productID'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin/products'
+    | '/admin/users'
+    | '/cat/$categoryID'
+    | '/admin/'
+    | '/cat/'
+    | '/admin/shops/$shopId'
+    | '/det/$categoryID/$productID'
+    | '/admin/shops/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cat/$categoryID' | '/cat' | '/det/$categoryID/$productID'
+  to:
+    | '/'
+    | '/login'
+    | '/admin/products'
+    | '/admin/users'
+    | '/cat/$categoryID'
+    | '/admin'
+    | '/cat'
+    | '/admin/shops/$shopId'
+    | '/det/$categoryID/$productID'
+    | '/admin/shops'
   id:
     | '__root__'
     | '/'
+    | '/login'
+    | '/admin/products'
+    | '/admin/users'
     | '/cat/$categoryID'
+    | '/admin/'
     | '/cat/'
+    | '/admin/shops/$shopId'
     | '/det/$categoryID/$productID'
+    | '/admin/shops/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   CatCategoryIDRoute: typeof CatCategoryIDRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   CatIndexRoute: typeof CatIndexRoute
+  AdminShopsShopIdRoute: typeof AdminShopsShopIdRoute
   DetCategoryIDProductIDRoute: typeof DetCategoryIDProductIDRoute
+  AdminShopsIndexRoute: typeof AdminShopsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -81,6 +167,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/admin/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cat/': {
@@ -97,6 +211,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatCategoryIDRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/shops/': {
+      id: '/admin/shops/'
+      path: '/admin/shops'
+      fullPath: '/admin/shops/'
+      preLoaderRoute: typeof AdminShopsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/shops/$shopId': {
+      id: '/admin/shops/$shopId'
+      path: '/admin/shops/$shopId'
+      fullPath: '/admin/shops/$shopId'
+      preLoaderRoute: typeof AdminShopsShopIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/det/$categoryID/$productID': {
       id: '/det/$categoryID/$productID'
       path: '/det/$categoryID/$productID'
@@ -109,9 +237,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   CatCategoryIDRoute: CatCategoryIDRoute,
+  AdminIndexRoute: AdminIndexRoute,
   CatIndexRoute: CatIndexRoute,
+  AdminShopsShopIdRoute: AdminShopsShopIdRoute,
   DetCategoryIDProductIDRoute: DetCategoryIDProductIDRoute,
+  AdminShopsIndexRoute: AdminShopsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
