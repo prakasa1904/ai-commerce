@@ -1,6 +1,6 @@
 # Farm Marketplace
 
-Production-grade marketplace: React + Vite + TypeScript frontend, Express + SQLite3 backend. UI built on shadcn/ui primitives (Radix) with the Farm palette (wheat/forest/soil/moss). Solve blank-page issues.
+Production-grade marketplace: React + Vite + TypeScript frontend, Go + Fiber/GORM/SQLite3 backend. UI built on shadcn/ui primitives (Radix) with the Farm palette (wheat/forest/soil/moss). Solve blank-page issues.
 
 ## Tech Stack
 
@@ -11,7 +11,7 @@ Production-grade marketplace: React + Vite + TypeScript frontend, Express + SQLi
 | Styling | Tailwind CSS v4 |
 | Server State | TanStack Query v5 (`@tanstack/react-query`) |
 | Routing | TanStack Router v1 file-based routes in `src/routes/` |
-| Backend | Express 4, SQLite3 |
+| Backend | Go + Fiber, GORM, SQLite3 |
 | Build | `tsc && vite build` |
 
 ## Architecture
@@ -20,15 +20,15 @@ Production-grade marketplace: React + Vite + TypeScript frontend, Express + SQLi
 
 ```
 ┌─────────────┐   Vite proxy :5173    ┌──────────────┐   sqlite3    ┌──────────────────────┐
-│  Browser    │ ───────── /api/* ───▶ │  Express API │ ───────────▶ │ farmer_marketplace.db │
+│  Browser    │ ───────── /api/* ───▶ │  Go Fiber API │ ───────────▶ │ farmer_marketplace.db │
 │ (Vite dev)  │                       │      :5001    │              │     (SQLite3)        │
 └─────────────┘                       └──────────────┘              └──────────────────────┘
        │                                   │
        ▼                                   ▼
- ReactDOM (main.tsx)              routes: GET /api/products
-   └─ DataProvider (QueryClient)
-        └─ App.tsx → RouterProvider
-             └─ matched src/routes/ index.tsx  (Hero, GridViewCategory, GridViewProduct)
+  ReactDOM (main.tsx)              routes: GET /api/products
+    └─ DataProvider (QueryClient)
+         └─ App.tsx → RouterProvider
+              └─ matched src/routes/ index.tsx  (Hero, GridViewCategory, GridViewProduct)
                                                             │
    data path (frontend):                                     │
         useProducts ──▶ productService ──▶ productApi ──────┘
@@ -68,14 +68,14 @@ Backend and frontend must run as **two separate terminals** (Vite `dev` alone se
 # 1. Seed the DB (fresh checkout → farmer_marketplace.db is gitignored)
 npm run seed
 
-# 2. Start the Express backend (:5001)
-npm run start        # node server/index.js
+# 2. Start the Go backend (:5001)
+npm run start        # go run ./cmd/api (cwd = server/; DB_PATH=../farmer_marketplace.db)
 
 # 3. Start the Vite dev frontend (:5173) in a second terminal
 npm run dev          # vite; /api proxies to localhost:5001
 ```
 
-Open http://localhost:5173. Auto-seeds 8 products if the DB is empty.
+Open http://localhost:5173. Auto-seeds 8 products on startup when the DB is empty.
 
 Other scripts: `npm run build` (`tsc && vite build` → `dist/`), `npm run preview` (serve the built app).
 
@@ -107,15 +107,22 @@ src/
 │   ├── ui/                    # Local shadcn/ui primitives (modify directly)
 │   ├── atoms/                 # Header, ProductCard, NotFoundPage, ...
 │   └── molecules/             # GridViewProduct, GridViewCategory, ...
-server/
-├── index.js                   # Express API + DB init/migration + auto-seed
-└── seed.js                    # Standalone seed (npm run seed)
+server/                           Backend (Go, module in server/go.mod)
+├── cmd/api/                      # Fiber server entrypoint (:5001)
+├── cmd/seed/                     # Seed entrypoint
+├── internal/app/                 # Bootstrap, migrate, legacy fixes, seed
+├── internal/config/              # Env config (PORT, DB_PATH, JWT_SECRET, ...)
+├── internal/features/            # Feature-first: user, shop, product, admin
+│   ├── domain/ usecase/ repository/ delivery/http
+├── internal/platform/            # logger (zap), validator, database (gorm)
+├── internal/shared/              # errors, jwt, middleware, response
+└── go.mod                        # Go module dependencies
 ```
 
 ## Code Conventions
 
 ### TypeScript / files
-- `.tsx` (components) and `.ts` (hooks/services/types). `.js` only in `server/` and `vite.config.js`.
+- `.tsx` (components) and `.ts` (hooks/services/types). `.js` only in root config files (e.g. `vite.config.js`); the Go backend uses no JS.
 - Explicit prop types (`React.FC<Props>`), no implicit `any` — `tsc --noEmit` must pass.
 - Component size limits: Route ≤ 50 lines; page/module ≤ 80; atom ≤ 20. Extract sub-components when logic > ~20 lines.
 
@@ -235,5 +242,5 @@ None.
 ```
 
 ** LAST UPDATE:** 2026-10-09
-** OUTPUT:** React 18 + Vite + TS frontend (TanStack Query, TanStack Router) with shadcn/ui design system, Tailwind v4, Express/SQLite backend.
+** OUTPUT:** React 18 + Vite + TS frontend (TanStack Query, TanStack Router) with shadcn/ui design system, Tailwind v4, Go/Fiber + GORM/SQLite3 backend.
 ** TASK TRACKING:** Task files always live in `tasks/<task-name>-<number>.md`; see the Task Tracking section above.

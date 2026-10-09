@@ -120,12 +120,12 @@ const UsersPage: React.FC = () => {
               <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => openEdit(u)}>Edit</Button>
               {u.deletedAt ? (
                 isAdmin && (
-                  <button type="button" aria-label="Restore" className="h-8 px-2 rounded-md text-forest/70 hover:text-forest" onClick={() => restore.mutateAsync(u.id).catch(() => {})}>
+                  <button type="button" aria-label="Restore" className="h-8 px-2 rounded-md text-forest/70 hover:text-forest" onClick={() => restore.mutate(u.id)}>
                     <RotateCw className="h-3.5 w-3.5" />
                   </button>
                 )
               ) : isAdmin ? (
-                <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => remove.mutateAsync(u.id).catch(() => {})}>
+                <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => remove.mutate(u.id)}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               ) : null}

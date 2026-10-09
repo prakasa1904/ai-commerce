@@ -118,9 +118,9 @@ const ProductsPage: React.FC = () => {
                 <LinkIcon className="h-3.5 w-3.5" />
               </button>
               {p.deletedAt ? (
-                <button type="button" aria-label="Restore" className="h-8 px-2 rounded-md text-forest/70 hover:text-forest" onClick={() => restore.mutateAsync(p.id).catch(() => {})}><RotateCw className="h-3.5 w-3.5" /></button>
+                <button type="button" aria-label="Restore" className="h-8 px-2 rounded-md text-forest/70 hover:text-forest" onClick={() => restore.mutate(p.id)}><RotateCw className="h-3.5 w-3.5" /></button>
               ) : (
-                <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => remove.mutateAsync(p.id).catch(() => {})}><Trash2 className="h-3.5 w-3.5" /></button>
+                <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => remove.mutate(p.id)}><Trash2 className="h-3.5 w-3.5" /></button>
               )}
             </div>
           ) },
@@ -207,9 +207,9 @@ function ProductShopLinkDialog({ productId, onClose }: { productId: number | nul
   const { data: userShops = [] } = useOwnShops(token);
   const linkMutations = useProductShopMutations(token);
 
-  const handleLink = async () => {
+  const handleLink = () => {
     if (selectedShop === '' || !productId) return;
-    await linkMutations.link.mutateAsync({
+    linkMutations.link.mutate({
       productId,
       shopId: selectedShop,
       ...(price !== '' ? { price: Number(price) } : {}),

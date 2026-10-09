@@ -32,10 +32,10 @@ const ShopDetailPage: React.FC = () => {
   const memberMutations = useMemberMutations(token, shopIdNum);
   const linkMutations = useProductShopMutations(token);
 
-  const handleInvite = async () => {
+  const handleInvite = () => {
     const match = /^(\d+)$/.exec(inviteUser.trim());
     if (!match) return;
-    await memberMutations.add.mutateAsync({ userId: Number(match[1]), role: 'non_admin' });
+    memberMutations.add.mutate({ userId: Number(match[1]), role: 'non_admin' });
     setInviteUser('');
   };
 
@@ -74,7 +74,7 @@ const ShopDetailPage: React.FC = () => {
               { header: 'Price', accessor: 'price', render: (p: { price: number | null }) => p.price ? `Rp${p.price.toLocaleString('id-ID')}` : '—' },
               { header: 'Stock', accessor: 'stock' },
               { header: 'Actions', accessor: 'productId', className: 'w-32', render: (p: { productId: number }) => (
-                <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => linkMutations.unlink.mutateAsync({ productId: p.productId, shopId: shopIdNum }).catch(() => {})}>
+                <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => linkMutations.unlink.mutate({ productId: p.productId, shopId: shopIdNum })}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               ) },
@@ -123,9 +123,9 @@ const ShopDetailPage: React.FC = () => {
                 { header: 'Actions', accessor: 'userId', className: 'w-36', render: (m: ShopMember) => (
                   <div className="flex items-center gap-1.5">
                     {m.role === 'non_admin' && (
-                      <button type="button" className="h-8 px-2 rounded-md text-xs text-forest/70 hover:text-forest" onClick={() => memberMutations.update.mutateAsync({ userId: m.userId, role: 'admin' }).catch(() => {})}>Make admin</button>
+                      <button type="button" className="h-8 px-2 rounded-md text-xs text-forest/70 hover:text-forest" onClick={() => memberMutations.update.mutate({ userId: m.userId, role: 'admin' })}>Make admin</button>
                     )}
-                    <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => memberMutations.remove.mutateAsync(m.userId).catch(() => {})}>
+                    <button type="button" aria-label="Remove" className="h-8 px-2 rounded-md text-rose-600 hover:text-rose-700" onClick={() => memberMutations.remove.mutate(m.userId)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>

@@ -3,13 +3,13 @@
   "version": "1.0.1",
   "private": true,
   "type": "module",
-  "main": "server/index.js",
+  "main": "server/cmd/api/main.go",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "start": "go run ./cmd/api",
-    "seed": "go run ./cmd/seed"
+    "start": "cd server && DB_PATH=../farmer_marketplace.db go run ./cmd/api",
+    "seed": "cd server && DB_PATH=../farmer_marketplace.db go run ./cmd/seed"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.3",
@@ -25,7 +25,7 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.48.0",
     "react": "^18.3.1",
-"react-dom": "^18.3.1",
+    "react-dom": "^18.3.1",
     "sqlite3": "^5.1.7",
     "tailwind-merge": "^3.7.0"
   },
@@ -35,6 +35,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.7.0",
+    "shadcn": "^4.21.4",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^5.4.7"
