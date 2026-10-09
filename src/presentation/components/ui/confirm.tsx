@@ -14,6 +14,7 @@ export interface ConfirmDialogProps {
   cancelText?: string;
   pending?: boolean;
   disabled?: boolean;
+  confirmVariant?: 'destructive' | 'default';
 }
 
 export function ConfirmDialog({
@@ -27,6 +28,7 @@ export function ConfirmDialog({
   cancelText = 'Cancel',
   pending = false,
   disabled = false,
+  confirmVariant = 'destructive',
 }: ConfirmDialogProps) {
   return (
     <Dialog
@@ -40,7 +42,7 @@ export function ConfirmDialog({
             {cancelText}
           </Button>
           <Button
-            variant="destructive"
+            variant={confirmVariant}
             onClick={() => onConfirm()}
             disabled={disabled || pending}
           >
