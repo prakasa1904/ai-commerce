@@ -11,3 +11,5 @@ build/
 
 # Local SQLite data (recreate with `npm run seed`)
 farmer_marketplace.db
+farmer_marketplace.db-shm
+farmer_marketplace.db-wal
