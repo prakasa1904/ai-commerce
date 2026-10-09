@@ -8,6 +8,7 @@ type Stats struct {
 	ActiveUsers     int64 `json:"activeUsers"`
 	Shops           int64 `json:"shops"`
 	Products        int64 `json:"products"`
+	Memberships     int64 `json:"memberships"`
 	DeletedUsers    int64 `json:"deletedUsers"`
 	DeletedShops    int64 `json:"deletedShops"`
 	DeletedProducts int64 `json:"deletedProducts"`

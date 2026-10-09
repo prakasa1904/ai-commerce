@@ -40,6 +40,7 @@ func (c *GormStatsCollector) Collect(ctx context.Context) (usecase.Stats, error)
 		ActiveUsers:     c.count(ctx, "users", "deleted_at IS NULL"),
 		Shops:           c.count(ctx, "shops", ""),
 		Products:        c.count(ctx, "products", ""),
+		Memberships:     c.count(ctx, "shop_members", "deleted_at IS NULL"),
 		DeletedUsers:    c.count(ctx, "users", "deleted_at IS NOT NULL"),
 		DeletedShops:    c.count(ctx, "shops", "deleted_at IS NOT NULL"),
 		DeletedProducts: c.count(ctx, "products", "deleted_at IS NOT NULL"),

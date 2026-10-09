@@ -71,6 +71,7 @@ export type AdminStats = {
   activeUsers: number;
   shops: number;
   products: number;
+  memberships: number;
   deletedUsers: number;
   deletedShops: number;
   deletedProducts: number;
