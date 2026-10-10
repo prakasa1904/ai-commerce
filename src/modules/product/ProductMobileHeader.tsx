@@ -1,14 +1,13 @@
+import { Leaf } from 'lucide-react';
 import type { Product } from '../../domain/types/product';
-import { categoryLabels, productRating } from './productUtils';
-import RatingSeal from './RatingSeal';
+import { categoryLabels } from './productUtils';
 
 interface ProductMobileHeaderProps {
   product: Product;
 }
 
 const ProductMobileHeader = ({ product }: ProductMobileHeaderProps) => {
-  const imageUrl = product.imageUrl ?? 'https://dummyimage.com/800x600/1E3B2C/FBF8F1&text=Farm+Fresh';
-  const { score, reviews } = productRating(product.id);
+  const imageUrl = product.imageUrl ?? '/img/product-placeholder.svg';
 
   return (
     <header className="lg:hidden grid grid-cols-[1fr_4rem] items-center gap-4">
@@ -17,7 +16,7 @@ const ProductMobileHeader = ({ product }: ProductMobileHeaderProps) => {
           src={imageUrl}
           alt={product.title}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-700"
         />
       </div>
       <div className="flex flex-1 flex-col gap-4">
@@ -27,7 +26,10 @@ const ProductMobileHeader = ({ product }: ProductMobileHeaderProps) => {
         <h1 className="text-xl font-black leading-tight text-forest font-display">
           {product.title}
         </h1>
-        <RatingSeal score={score} reviews={reviews} />
+        <span className="inline-flex items-center gap-1 rounded-full bg-honey/95 px-3 py-1 font-display font-black text-[0.62rem] uppercase tracking-[0.12em] text-forest">
+          <Leaf className="h-2.5 w-2.5 text-forest/70" aria-hidden="true" />
+          Harvested today
+        </span>
       </div>
     </header>
   );

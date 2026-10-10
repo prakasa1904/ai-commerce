@@ -22,10 +22,4 @@ export const categoryCopy: Record<ProductCategory, string> = {
   supplies: 'Everything you need to keep the field turning, season after season.',
 };
 
-export const FALLBACK_IMAGE_URL =
-  'https://dummyimage.com/800x600/1E3B2C/FBF8F1&text=Farm+Fresh';
-
-export const productRating = (productId: number): { score: number; reviews: number } => ({
-  score: Math.round((4.2 + ((productId * 37) % 60) / 100) * 20) / 20,
-  reviews: 40 + ((productId * 71) % 280),
-});
+export const FALLBACK_IMAGE_URL = '/img/product-placeholder.svg';

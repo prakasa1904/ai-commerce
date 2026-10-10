@@ -148,99 +148,31 @@ server/                           Backend (Go, module in server/go.mod)
 
 ## Task Tracking
 
-Track every task in a Markdown file under `tasks/`. Task files keep progress, context, and targets available across sessions, so another agent can pick up the work from the written plan alone.
+All tasks are tracked and executed with the superpower workflow: work is dispatched to subagents, never hand-tracked in a local markdown file. Do not create `tasks/*.md` files.
 
-- `tasks/` holds task files only. `tasks/*.md` is gitignored; never commit task files.
-- One file per task. A task file lives from the first step to `DONE`.
+### When to dispatch
 
-### When to create a file
+Always dispatch before editing code. Any unit of work big enough to be a step in a plan — including debugging one bug, adding one page, or wiring one integration — is delegated through the Task tool, not done inline.
 
-Always create a task file before editing code. Even a small task gets a minimal file with the sections below filled in compactly. Do not batch unrelated tasks into one file.
+### Dispatch model
 
-### Naming
+- Use the Task tool with `subagent_type: "general"` for implementation and research work. Use `subagent_type: "explore"` only for pure codebase exploration.
+- Load the matching superpower skill first so the subagent follows the right workflow: `dispatching-parallel-agents` to fan out independent work, `subagent-driven-development` for multi-step feature delivery, `executing-plans` when inline execution is unavoidable, `systematic-debugging` for bug hunts, `using-superpowers` for the harness's tool mapping.
+- Prefer many small, well-scoped delegates over one large handoff. Independent units of work run in parallel in a single message.
+- Every delegate prompt carries: the goal in one paragraph, exact target files, required conventions (this AGENTS.md's naming/layers/code-style), and the acceptance commands (`npm run build`, `tsc --noEmit`). The delegate must not ask clarifying questions — give it everything it needs to finish unaided.
+- Delegates receive this AGENTS.md's layer conventions and may not bypass them.
 
-Name each file `<task-name>-<number>.md`:
+### Completion & verification
 
-- `<task-name>`: lowercase kebab-case slug, e.g. `category-detail`, `admin-soft-delete`, `home-hero`.
-- `<number>`: the next free integer across `tasks/`. Find it with:
-  ```bash
-  ls tasks/*.md | sed -E 's/.*\-([0-9]+)\.md/\1/' | sort -n | tail -1
-  ```
-  Take the largest number and add 1. Never reuse a number.
+1. The parent agent stays the single point of ownership and merges the delegate outputs.
+2. Run the same acceptance commands as the delegate (per this AGENTS.md's architectural rules) to confirm the combined result before treating the task as done.
+3. If a delegate stops early (limits, errors), resume it with `task_id` rather than re-dispatching blind.
 
-### Required sections
+### Leverage
 
-Write these sections in every task file:
-
-| Section | Contents |
-|---|---|
-| `# Title` | Task name; matches `<task-name>`. |
-| `## Status` | `TODO`, `IN_PROGRESS`, `BLOCKED`, or `DONE`. |
-| `## Overview` | What to build or change and why. State the user-visible outcome in two to four sentences. |
-| `## Target` | Exact paths to create or edit (`src/modules/category/CategoryDetailPage.tsx`), routes involved, endpoints touched (`GET /api/products`), types and schema, and UI tokens or primitives used. Be concrete so an agent acts without asking. |
-| `## Steps` | Ordered checklist. Each step is one action. |
-| `## Key Details` | Relevant types, conventions, and constraints: TanStack Query cache keys, route nesting rules, shadcn/ui primitives, line limits. |
-| `## Acceptance Criteria` | Verifiable conditions that define done. |
-| `## Verification` | Commands that prove the change works: `npm run build`, `tsc --noEmit`, `curl http://localhost:5001/api/products`. |
-| `## Dependencies` | Related task files, DB state (`npm run seed`), or prerequisite work. |
-| `## Progress Log` | Timestamped entries as work proceeds. |
-
-### Lifecycle
-
-1. Create the task file with `Status: TODO` before editing code.
-2. Set `Status: IN_PROGRESS` when work starts and append a `Progress Log` line per step with the timestamp.
-3. Run the commands in `Verification`.
-4. Mark `Status: DONE` only when the acceptance criteria pass. Append a final log line with the outcome.
-
-### Handoff between agents
-
-When a task changes hands because of a context switch or a subagent delegation, point the executing agent at the task file, for example `tasks/category-detail-3.md`. The receiving agent reads `Target`, `Steps`, and `Key Details`, completes the remaining steps, and updates `Status` and `Progress Log`. Do not create a duplicate task file while one exists with `Status` of `TODO` or `IN_PROGRESS`.
-
-### Example
-
-`tasks/home-hero-1.md`:
-
-```markdown
-# Home page hero
-
-## Status
-IN_PROGRESS
-
-## Overview
-Redesign the hero on `/` with the forage voice and hand-drawn marks. One title, one support line, and one primary call-to-action (CTA).
-
-## Target
-- Edit `src/modules/home/Hero.tsx`. Keep it under 80 lines; extract copy into `src/modules/home/heroCopy.ts` if it grows.
-- CTA uses the shadcn/ui `Button` with the `bg-honey` token.
-- No route change; the hero lives in `modules/home`, served at `/`.
-
-## Steps
-- [x] Define headline and support copy in `heroCopy.ts`
-- [x] Restructure `Hero.tsx`: `Card` wrapper, heading, support line, `Button` CTA
-- [ ] Verify the hero renders on `/` and the CTA scrolls to `#products`
-
-## Key Details
-- Headline: `Today's harvest, sealed at dawn.`
-- Support: `Seven stalls, one crate. From the field to your table the same afternoon.`
-- CTA label: `See today's stalls`, with `href="#products"` for the harvest list.
-- `useProducts` returns the first three products as the harvest ticket.
-
-## Acceptance Criteria
-- Hero shows the headline, support line, and CTA on `/`.
-- Harvest ticket lists the first three products with formatted prices.
-- `npm run build` passes with no TypeScript errors.
-
-## Verification
-Run `npm run build` (`tsc && vite build`). Open http://localhost:5173 and confirm the hero renders and scrolls to `#products`.
-
-## Dependencies
-None.
-
-## Progress Log
-- 2026-10-09 14:00: created; copy extracted; Hero restructured
-- 2026-10-09 14:30: awaiting CTA scroll verification
-```
+- Subagents are the default execution path; do not use them to avoid a decision the parent must own (design direction, cross-file architecture, any commit).
+- Reverse handoffs: a subagent that needs another agent's result should request it through the parent, not spawn siblings on its own.
 
 ** LAST UPDATE:** 2026-10-09
 ** OUTPUT:** React 18 + Vite + TS frontend (TanStack Query, TanStack Router) with shadcn/ui design system, Tailwind v4, Go/Fiber + GORM/SQLite3 backend.
-** TASK TRACKING:** Task files always live in `tasks/<task-name>-<number>.md`; see the Task Tracking section above.
+** TASK TRACKING:** Superpowers only — dispatch work through subagents; never track in `tasks/*.md`. See the Task Tracking section above.

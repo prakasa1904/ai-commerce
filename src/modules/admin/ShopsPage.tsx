@@ -22,7 +22,7 @@ const ShopsPage: React.FC = () => {
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [restoringId, setRestoringId] = useState<number | null>(null);
 
-  const { data: shops = [], isLoading } = useAdminShops(token, {
+  const { data: shops = [], isLoading, isError, refetch } = useAdminShops(token, {
     q: query || undefined,
     includeDeleted: (isAdmin && showDeleted) || undefined,
   });
@@ -100,6 +100,8 @@ const ShopsPage: React.FC = () => {
         ]}
         data={shops}
         loading={isLoading}
+        error={isError ? new Error('Could not load data') : null}
+        onRetry={refetch}
         getRowClassName={(s: AdminShop) => (s.deletedAt ? 'bg-honey/10' : undefined)}
         onRowClick={(s: AdminShop) => openShop(s.id)}
         emptyMessage="No shops yet. Create one to start selling."

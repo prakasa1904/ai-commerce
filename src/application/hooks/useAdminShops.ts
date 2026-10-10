@@ -66,8 +66,9 @@ export function useAdminShopMutations(token: string | null) {
 
   const remove = useMutation({
     mutationFn: (id: number) => (token ? adminService.deleteShop(token, id) : Promise.reject(new Error('Not authenticated'))),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
       invalidate();
+      qc.invalidateQueries({ queryKey: queryKeys.admin.shop(id) });
       toast({ title: 'Shop deleted.', variant: 'success' });
     },
     onError: (error) => toast({ title: 'Could not delete shop.', description: error instanceof Error ? error.message : undefined, variant: 'destructive' }),
@@ -75,8 +76,9 @@ export function useAdminShopMutations(token: string | null) {
 
   const restore = useMutation({
     mutationFn: (id: number) => (token ? adminService.restoreShop(token, id) : Promise.reject(new Error('Not authenticated'))),
-    onSuccess: () => {
+    onSuccess: (_data, id) => {
       invalidate();
+      qc.invalidateQueries({ queryKey: queryKeys.admin.shop(id) });
       toast({ title: 'Shop restored.', variant: 'success' });
     },
     onError: (error) => toast({ title: 'Could not restore shop.', description: error instanceof Error ? error.message : undefined, variant: 'destructive' }),

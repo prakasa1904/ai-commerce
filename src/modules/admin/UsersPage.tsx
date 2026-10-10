@@ -47,7 +47,7 @@ const UsersPage: React.FC = () => {
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [restoringId, setRestoringId] = useState<number | null>(null);
 
-  const { data: users = [], isLoading } = useAdminUsers(token, {
+  const { data: users = [], isLoading, isError, refetch } = useAdminUsers(token, {
     q: query || undefined,
     includeDeleted: showDeleted || undefined,
   });
@@ -242,6 +242,8 @@ const UsersPage: React.FC = () => {
         ]}
         data={users}
         loading={isLoading}
+        error={isError ? new Error('Could not load data') : null}
+        onRetry={refetch}
         getRowClassName={(u: AdminUser) => (u.deletedAt ? 'bg-honey/10' : undefined)}
         emptyMessage="No accounts yet."
         emptyAction={

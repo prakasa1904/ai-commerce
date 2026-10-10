@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useNavigate } from '@tanstack/react-router';
 import { Button } from '../../presentation/components/ui/button';
 import { Badge } from '../../presentation/components/ui/badge';
@@ -6,7 +6,7 @@ import { Dialog } from '../../presentation/components/ui/dialog';
 import { ConfirmDialog } from '../../presentation/components/ui/confirm';
 import { Select } from '../../presentation/components/ui/select';
 import { TextField } from '../../presentation/components/ui/textfield';
-import { TabsList, TabsTrigger } from '../../presentation/components/ui/tabs';
+import { TabsList, TabsTrigger, TabsPanel } from '../../presentation/components/ui/tabs';
 import { Trash2, Loader2, ShieldCheck, Package } from 'lucide-react';
 import { DataTable } from '../../presentation/components/molecules/DataTable';
 import type { AdminUser, ShopMember } from '../../domain/types/admin';
@@ -92,6 +92,7 @@ const ShopDetailPage: React.FC = () => {
   const [promotingId, setPromotingId] = useState<number | null>(null);
   const [removingMemberId, setRemovingMemberId] = useState<number | null>(null);
   const [unlinking, setUnlinking] = useState<{ productId: number; productName: string } | null>(null);
+  const formSeededRef = useRef(false);
 
   const { data: shop } = useAdminShop(token, shopIdNum || null);
   const { data: members = [], isLoading: membersLoading } = useShopMembers(token, shopIdNum);
@@ -102,8 +103,32 @@ const ShopDetailPage: React.FC = () => {
   const linkMutations = useProductShopMutations(token);
   const { toast } = useToast();
 
+  const openEdit = () => {
+    if (shop) {
+      setForm({
+        name: shop.name,
+        description: shop.description,
+        website: shop.website,
+        phone: shop.phone,
+        email: shop.email,
+        address: shop.address,
+        employees: shop.employees,
+      });
+      setErrors({});
+      formSeededRef.current = true;
+    } else {
+      formSeededRef.current = false;
+    }
+    setEditing(true);
+  };
+
   useEffect(() => {
-    if (editing && shop?.id === shopIdNum) {
+    if (!editing) {
+      formSeededRef.current = false;
+      return;
+    }
+    if (!formSeededRef.current && shop?.id === shopIdNum) {
+      formSeededRef.current = true;
       setForm({
         name: shop.name,
         description: shop.description,
@@ -167,16 +192,17 @@ const ShopDetailPage: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={() => setEditing(true)}>Edit shop</Button>
+          <Button variant="secondary" size="sm" onClick={openEdit}>Edit shop</Button>
         </div>
       </div>
 
       <TabsList aria-label="Shop sections">
-        <TabsTrigger active={tab === 'members'} onClick={() => setTab('members')}>Members</TabsTrigger>
-        <TabsTrigger active={tab === 'products'} onClick={() => setTab('products')}>Products</TabsTrigger>
+        <TabsTrigger active={tab === 'members'} id="tab-0" aria-controls="panel-0" tabIndex={tab === 'members' ? 0 : -1} onClick={() => setTab('members')}>Members</TabsTrigger>
+        <TabsTrigger active={tab === 'products'} id="tab-1" aria-controls="panel-1" tabIndex={tab === 'products' ? 0 : -1} onClick={() => setTab('products')}>Products</TabsTrigger>
       </TabsList>
 
       {tab === 'members' ? (
+        <TabsPanel id="panel-0" aria-labelledby="tab-0">
         <section className="pt-6">
           <h2 className="text-lg font-black text-forest font-display">Members</h2>
           <p className="text-sm text-soil/60 mt-1">
@@ -191,7 +217,7 @@ const ShopDetailPage: React.FC = () => {
               className="rounded-full"
             >
               <option value="">Choose a user to invite…</option>
-              {users.map((u: AdminUser) => (
+              {users.filter((u: AdminUser) => !u.deletedAt).map((u: AdminUser) => (
                 <option key={u.id} value={u.id}>{u.username} ({u.email})</option>
               ))}
             </Select>
@@ -227,7 +253,9 @@ const ShopDetailPage: React.FC = () => {
             emptyMessage="No members yet. Invite a user above."
           />
         </section>
+        </TabsPanel>
       ) : (
+        <TabsPanel id="panel-1" aria-labelledby="tab-1">
         <section className="pt-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <h2 className="text-lg font-black text-forest font-display">Products in this shop</h2>
@@ -256,8 +284,9 @@ const ShopDetailPage: React.FC = () => {
                 <Package className="h-4 w-4 mr-1.5" /> Link products
               </Button>
             }
-          />
+            />
         </section>
+        </TabsPanel>
       )}
 
       <ConfirmDialog

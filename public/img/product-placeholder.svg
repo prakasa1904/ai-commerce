@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Product placeholder">
+  <rect width="400" height="300" fill="#F6F1E4"/>
+  <circle cx="200" cy="140" r="150" fill="#FBF8F1" opacity="0.55"/>
+  <circle cx="200" cy="130" r="118" fill="#E3A72F" opacity="0.14"/>
+
+  <circle cx="92" cy="62" r="5" fill="#7A9B6D" opacity="0.7"/>
+  <circle cx="296" cy="86" r="4" fill="#E3A72F" opacity="0.6"/>
+  <circle cx="112" cy="96" r="2.5" fill="#1E3B2C" opacity="0.15"/>
+  <circle cx="148" cy="66" r="2.5" fill="#1E3B2C" opacity="0.12"/>
+
+  <g stroke-linecap="round">
+    <ellipse cx="190" cy="186" rx="11" ry="30" transform="rotate(-38 200 190)" fill="#7A9B6D"/>
+    <ellipse cx="210" cy="186" rx="11" ry="30" transform="rotate(38 200 190)" fill="#1E3B2C"/>
+    <ellipse cx="196" cy="152" rx="4.5" ry="9" transform="rotate(-15 200 152)" fill="#1E3B2C"/>
+    <ellipse cx="204" cy="156" rx="4.5" ry="9" transform="rotate(18 200 152)" fill="#7A9B6D"/>
+    <path d="M200 138 C 208 141 210 147 210 152 C 210 158 204 161 200 161 C 196 161 190 158 190 152 C 190 147 192 141 200 138 Z" fill="#1E3B2C"/>
+    <path d="M200 218 C 197 226 198 232 200 236 M200 218 C 203 226 202 232 200 236" stroke="#F6F1E4" stroke-width="2.5" stroke-dasharray="2 3"/>
+  </g>
+
+  <text x="200" y="272" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="22" letter-spacing="5" fill="#1E3B2C">FARM FRESH</text>
+</svg>

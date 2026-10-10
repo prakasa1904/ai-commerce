@@ -53,7 +53,7 @@ interface CategoryGridProps {
 
 const CategoryGrid: React.FC<CategoryGridProps> = ({ onSelect, active, showHeading = true }) => {
   const content = (
-    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
       {categories.map((category) => (
         <CategoryCard key={category.link} category={category} active={active === category.link} onClick={(link: ProductCategory) => onSelect(link)} />
       ))}

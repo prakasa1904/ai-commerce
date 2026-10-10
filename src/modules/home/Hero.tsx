@@ -1,18 +1,43 @@
 import React from 'react';
 import { useProducts } from '../../application/hooks/useProducts';
 import { formatPrice, unitOf } from '../product/productUtils';
+import type { Product } from '../../domain/types/product';
 import BrandSeal from '../../presentation/components/atoms/BrandSeal';
+import { Skeleton, SkeletonText } from '../../presentation/components/ui/skeleton';
+
+const TicketRow: React.FC<{ product?: Product }> = ({ product }) => (
+  <li className="flex items-baseline justify-between gap-4">
+    <span className="flex items-baseline gap-3">
+      {product ? (
+        <>
+          <span
+            aria-hidden="true"
+            className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-honey shadow-[0_0_6px_rgba(227,167,47,0.9)]"
+          />
+          <span className="font-display font-semibold text-sm text-forest tracking-tight">{product.title}</span>
+        </>
+      ) : (
+        <>
+          <Skeleton className="h-2.5 w-2.5 shrink-0 rounded-full" />
+          <SkeletonText className="w-32 sm:w-44" />
+        </>
+      )}
+    </span>
+    {product ? (
+      <span className="font-display font-black text-base text-clay tabular-nums tracking-tight">
+        {formatPrice(product.price)} / {unitOf(product.description)}
+      </span>
+    ) : (
+      <SkeletonText className="w-28 shrink-0 tabular-nums" />
+    )}
+  </li>
+);
 
 const Hero: React.FC = () => {
-  const { data: products } = useProducts();
+  const { data: products, isLoading } = useProducts();
 
-  const today = products?.slice(0, 3) ?? [
-    { title: 'Roma tomatoes', price: 12000, category: 'vegetables' as const, id: 1, imageUrl: null, description: 'Fresh bunch', wholesale: false },
-    { title: 'Basmati rice', price: 32000, category: 'grains' as const, id: 2, imageUrl: null, description: '1 kg', wholesale: false },
-    { title: 'Free-range eggs', price: 45000, category: 'dairy' as const, id: 3, imageUrl: null, description: '1 tray', wholesale: false },
-  ];
-
-  const crateTotal = today.reduce((sum, p) => sum + p.price, 0);
+  const today = products?.slice(0, 3);
+  const crateTotal = today?.reduce((sum, p) => sum + p.price, 0) ?? 0;
 
   return (
     <section
@@ -68,42 +93,29 @@ const Hero: React.FC = () => {
           </div>
 
           <div className="lg:col-span-5 relative">
-            <div
-              aria-hidden="true"
-              className="absolute -inset-6 -z-0 bg-forest rounded-[32px] rotate-1 shadow-2xl border border-moss/20"
-            />
+            <div aria-hidden="true" className="absolute -inset-6 -z-0 bg-forest rounded-[32px] rotate-1 shadow-2xl border border-moss/20" />
             <div className="relative bg-wheat rounded-[32px] border border-[#E7D9AE]/60 p-6 lg:p-8 shadow-2xl">
               <div className="border-b-2 border-[#E7D9AE]/60 pb-4 mb-4 flex items-baseline justify-between gap-4">
                 <span className="font-display font-black text-[10px] tracking-[0.35em] uppercase text-soil">Harvest ticket</span>
                 <span className="font-display text-[10px] tracking-[0.2em] uppercase text-clay/80">Same-day</span>
               </div>
               <ul className="space-y-3.5">
-                {today.map((product) => (
-                  <li key={product.id} className="flex items-baseline justify-between gap-4">
-                    <span className="flex items-baseline gap-3">
-                      <span
-                        aria-hidden="true"
-                        className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-honey shadow-[0_0_6px_rgba(227,167,47,0.9)]"
-                      />
-                      <span className="font-display font-semibold text-sm text-forest tracking-tight">{product.title}</span>
-                    </span>
-                    <span className="font-display font-black text-base text-clay tabular-nums tracking-tight">
-                      {formatPrice(product.price)} / {unitOf(product.description)}
-                    </span>
-                  </li>
-                ))}
+                {isLoading || !products
+                  ? [0, 1, 2].map((i) => <TicketRow key={i} />)
+                  : products.slice(0, 3).map((product) => <TicketRow key={product.id} product={product} />)}
               </ul>
               <div className="mt-5 flex items-center justify-between border-t border-[#E7D9AE]/60 pt-4">
                 <span className="font-display text-[10px] uppercase tracking-[0.25em] text-soil/80">
                   Total for one crate
                 </span>
-                <span className="font-display font-black text-lg text-forest">{formatPrice(crateTotal)}</span>
+                {isLoading || !products ? (
+                  <SkeletonText className="w-24 shrink-0" />
+                ) : (
+                  <span className="font-display font-black text-lg text-forest">{formatPrice(crateTotal)}</span>
+                )}
               </div>
             </div>
-            <div
-              aria-hidden="true"
-              className="absolute -bottom-6 -left-6 h-20 w-20 bg-moss/90 rounded-full blur-2xl"
-            />
+            <div aria-hidden="true" className="absolute -bottom-6 -left-6 h-20 w-20 bg-moss/90 rounded-full blur-2xl" />
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ const CartLineItem: React.FC<{
   onRemove: () => void;
 }> = ({ item, onIncrement, onDecrement, onRemove }) => (
   <div className="flex items-center gap-3 py-3">
-    <img src={item.product.imageUrl ?? 'https://dummyimage.com/300x300/3E6B4F/FBF8F1&text=Farm%20Fresh'}
+    <img src={item.product.imageUrl ?? '/img/product-placeholder.svg'}
       alt={item.product.title} loading="lazy"
       className="h-16 w-16 shrink-0 rounded-lg border border-wheat/40 object-cover bg-cream" />
     <div className="min-w-0 flex-1">

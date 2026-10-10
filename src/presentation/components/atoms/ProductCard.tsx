@@ -13,11 +13,11 @@ import CratePlate from './CratePlate';
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const cart = useCart();
   const { toast } = useToast();
-  const imageUrl = product.imageUrl ?? 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Farm+Fresh';
+  const imageUrl = product.imageUrl ?? '/img/product-placeholder.svg';
 
   return (
     <Card className="group relative bg-card border-wheat/60 overflow-hidden hover:border-moss/40 shadow-sm hover:shadow-lg transition-all h-full flex flex-col">
-      <Link to="/det/$categoryID/$productID" params={{ categoryID: product.category, productID: product.id.toString() }} aria-label={`View ${product.title}`} className="block">
+      <Link to="/det/$categoryID/$productID" params={{ categoryID: product.category, productID: product.id.toString() }} aria-label={`View ${product.title}`} className="block rounded-t-2xl focus-visible:outline-2 focus-visible:outline-forest focus-visible:outline-offset-2">
         <div className="relative h-48 sm:h-52 overflow-hidden rounded-t-2xl bg-forest/5">
           <img src={imageUrl} alt={product.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
           <div className="absolute top-2 left-2"><Badge variant="secondary" className="inline-block bg-forest/85 text-cream/90 text-[0.62rem] tracking-[0.18em]">{product.category}</Badge></div>

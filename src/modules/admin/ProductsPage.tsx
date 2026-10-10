@@ -75,7 +75,7 @@ function validate(fields: Partial<ProductForm>): FieldErrors {
 const formatRp = (value: number) => `Rp${value.toLocaleString('id-ID')}`;
 
 const ProductsPage: React.FC = () => {
-  const { token } = useAuthContext();
+  const { token, isAdmin } = useAuthContext();
   const [query, setQuery] = useState('');
   const [showDeleted, setShowDeleted] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -86,9 +86,9 @@ const ProductsPage: React.FC = () => {
   const [restoringId, setRestoringId] = useState<number | null>(null);
   const [linkingId, setLinkingId] = useState<number | null>(null);
 
-  const { data: products = [], isLoading } = useAdminProducts(token, {
+  const { data: products = [], isLoading, isError, refetch } = useAdminProducts(token, {
     q: query || undefined,
-    includeDeleted: showDeleted || undefined,
+    includeDeleted: (isAdmin && showDeleted) || undefined,
   });
   const { create, update, remove, restore } = useAdminProductMutations(token);
 
@@ -181,7 +181,7 @@ const ProductsPage: React.FC = () => {
           className="max-w-md rounded-full"
         />
         <label className="inline-flex items-center gap-2 text-sm text-soil/70">
-          <input type="checkbox" checked={showDeleted} onChange={(e) => setShowDeleted(e.target.checked)} className="rounded border-wheat/60 bg-card accent-forest" />
+          <input type="checkbox" checked={showDeleted} onChange={(e) => setShowDeleted(e.target.checked)} disabled={!isAdmin} className="rounded border-wheat/60 bg-card accent-forest disabled:opacity-50 disabled:cursor-not-allowed" />
           Show removed
         </label>
       </div>
@@ -220,6 +220,8 @@ const ProductsPage: React.FC = () => {
         ]}
         data={products}
         loading={isLoading}
+        error={isError ? new Error('Could not load data') : null}
+        onRetry={refetch}
         getRowClassName={(p: AdminProduct) => (p.deletedAt ? 'bg-honey/10' : undefined)}
         emptyMessage="No products yet. Create one to start listing."
         emptyAction={

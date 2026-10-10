@@ -2,6 +2,7 @@ import React from 'react';
 import type { Product } from '../../../domain/types/product';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
+import { Link } from '@tanstack/react-router';
 import { formatPrice, unitOf } from '../../../infrastructure/format/price';
 import { useCart } from '../../../application/hooks/useCart';
 import { useToast } from '../../../application/providers/ToastProvider';
@@ -9,7 +10,7 @@ import { useToast } from '../../../application/providers/ToastProvider';
 const ProductRow: React.FC<{ product: Product }> = ({ product }) => {
   const cart = useCart();
   const { toast } = useToast();
-  const imageUrl = product.imageUrl ?? 'https://dummyimage.com/400x300/3E6B4F/FBF8F1&text=Farm+Fresh';
+  const imageUrl = product.imageUrl ?? '/img/product-placeholder.svg';
 
   return (
     <li className="group flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-card border border-wheat/60 hover:border-moss/40 hover:shadow-md transition-all">
@@ -18,7 +19,7 @@ const ProductRow: React.FC<{ product: Product }> = ({ product }) => {
       </div>
       <div className="flex flex-1 flex-col gap-2 sm:gap-3">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display font-bold text-foreground text-lg">{product.title}</h3>
+          <Link to="/det/$categoryID/$productID" params={{ categoryID: product.category, productID: product.id.toString() }} aria-label={`View ${product.title}`} className="font-display font-bold text-foreground text-lg focus-visible:outline-2 focus-visible:outline-forest focus-visible:outline-offset-2">{product.title}</Link>
           <Badge variant="secondary" className="inline-block bg-forest/85 text-cream/90 text-[0.62rem] tracking-[0.18em]">{product.category}</Badge>
         </div>
         <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>

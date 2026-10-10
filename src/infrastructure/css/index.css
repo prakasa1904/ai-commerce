@@ -44,6 +44,9 @@
   --shadow-kraft: 0 2px 8px rgba(74,54,40,.08), 0 1px 2px rgba(74,54,40,.05);
   --shadow-kraft-lg: 0 12px 32px rgba(74,54,40,.12), 0 4px 10px rgba(74,54,40,.06);
 
+  --animate-drawer-in: drawer-in 240ms ease-out;
+  --animate-drawer-in-left: drawer-in-left 240ms ease-out;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: calc(var(--radius) + 2px);
@@ -92,5 +95,27 @@
   }
   h1, h2, h3, .font-display {
     font-family: var(--font-display);
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

@@ -1,6 +1,5 @@
 import type { Product } from '../../domain/types/product';
-import { categoryLabels, productRating } from './productUtils';
-import RatingSeal from './RatingSeal';
+import { categoryLabels } from './productUtils';
 import categoryMarks from '../../presentation/components/atoms/CategoryMark';
 
 interface ProductMetaProps {
@@ -8,20 +7,18 @@ interface ProductMetaProps {
 }
 
 const ProductMeta = ({ product }: ProductMetaProps) => {
-  const { score, reviews } = productRating(product.id);
   const Mark = categoryMarks[product.category];
 
   return (
     <div className="hidden lg:flex flex-col gap-7">
       <div className="flex flex-wrap items-center gap-3 gap-y-4">
-        <RatingSeal score={score} reviews={reviews} />
         {product.wholesale && (
           <span className="inline-flex items-center gap-1 bg-clay/15 text-clay font-display font-black text-[0.68rem] uppercase tracking-[0.18em] px-2.5 py-1 rounded-full">
             Wholesale lot
           </span>
         )}
         <span className="inline-flex items-center gap-1.5 text-[0.75rem] font-display font-black uppercase tracking-[0.12em] text-soil/60">
-          Harvested today
+          Harvested today · local farm
         </span>
       </div>
 
