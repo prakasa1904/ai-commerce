@@ -6,6 +6,7 @@ import type {
   ProductShopLink,
   ShopMember,
 } from '../../domain/types/admin';
+import type { ProductCategory } from '../../domain/types/product';
 
 const API = '/api/admin';
 
@@ -141,7 +142,7 @@ export const adminApi = {
     description?: string;
     price?: number;
     imageUrl?: string;
-    category?: string;
+    category?: ProductCategory;
     unit?: string;
     stock?: number;
     wholesale?: boolean;

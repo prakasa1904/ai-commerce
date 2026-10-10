@@ -53,3 +53,8 @@ type ShopProductModel struct {
 	CreatedAt int64  `gorm:"column:created_at"`
 	DeletedAt *int64 `gorm:"column:deleted_at"`
 }
+
+// TableName keeps the model aligned with the legacy shop_products join table.
+func (ShopProductModel) TableName() string {
+	return "shop_products"
+}

@@ -1,5 +1,6 @@
 import { adminApi } from '../../infrastructure/api/adminApi';
 import type { AdminUser } from '../../domain/types/admin';
+import type { ProductCategory } from '../../domain/types/product';
 
 type ShopInput = {
   name?: string;
@@ -16,7 +17,7 @@ type ProductInput = {
   description?: string;
   price?: number;
   imageUrl?: string;
-  category?: string;
+  category?: ProductCategory;
   unit?: string;
   stock?: number;
   wholesale?: boolean;

@@ -1,3 +1,5 @@
+import type { ProductCategory } from './product';
+
 export type UserRole = 'seller' | 'buyer';
 
 export type MembershipRole = 'admin' | 'non_admin';
@@ -46,7 +48,7 @@ export type AdminProduct = {
   description: string;
   price: number;
   imageUrl: string;
-  category: string;
+  category: ProductCategory;
   wholesale: boolean;
   unit: string;
   stock: number;

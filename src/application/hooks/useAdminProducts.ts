@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '../services/adminService';
 import { queryKeys } from '../../infrastructure/cache/queryKeys';
 import { useToast } from '../providers/ToastProvider';
+import type { ProductCategory } from '../../domain/types/product';
 
 export function useAdminProducts(token: string | null, filters: { q?: string; includeDeleted?: boolean } = {}) {
   return useQuery({
@@ -22,7 +23,7 @@ export function useAdminProductMutations(token: string | null) {
       description?: string;
       price: number;
       imageUrl?: string;
-      category?: string;
+      category?: ProductCategory;
       unit?: string;
       stock?: number;
       wholesale?: boolean;
@@ -43,7 +44,7 @@ export function useAdminProductMutations(token: string | null) {
         description?: string;
         price?: number;
         imageUrl?: string;
-        category?: string;
+        category?: ProductCategory;
         unit?: string;
         stock?: number;
         wholesale?: boolean;
