@@ -148,7 +148,7 @@ server/                           Backend (Go, module in server/go.mod)
 
 ## Task Tracking
 
-All tasks are tracked and executed with the superpower workflow: work is dispatched to subagents, never hand-tracked in a local markdown file. Do not create `tasks/*.md` files.
+All tasks are tracked and executed with the superpower workflow: work is dispatched to subagents, never hand-tracked in a local markdown file. Do not create `tasks/*.md` files. The workflow is defined in `.opencode/skills/superpowers/SKILL.md` — load it first.
 
 ### When to dispatch
 
