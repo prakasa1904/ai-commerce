@@ -53,6 +53,8 @@ export const adminService = {
   updateShop: (token: string, id: number, data: Partial<ShopInput>) =>
     adminApi.updateShop(token, id, data).then((r) => r.shop),
 
+  getShop: (token: string, id: number) => adminApi.getShop(token, id).then((r) => r.shop),
+
   deleteShop: (token: string, id: number) => adminApi.deleteShop(token, id),
   restoreShop: (token: string, id: number) => adminApi.restoreShop(token, id),
 

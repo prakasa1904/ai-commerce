@@ -98,6 +98,12 @@ export const adminApi = {
       return res.json() as Promise<{ shop: AdminShop }>;
     }),
 
+  getShop: (token: string, id: number) =>
+    fetch(`${API}/shops/${id}`, { headers: headers(token) }).then((res) => {
+      if (!res.ok) throw new Error('Shop fetch failed');
+      return res.json() as Promise<{ shop: AdminShop }>;
+    }),
+
   updateShop: (token: string, id: number, body: Partial<Omit<AdminShop, 'id' | 'ownerId' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'deletedAt'>>) =>
     fetch(`${API}/shops/${id}`, { method: 'PATCH', headers: headers(token), body: JSON.stringify(body) }).then((res) => {
       if (!res.ok) return res.json().then((b) => Promise.reject(new Error(b.error || 'Update shop failed')));

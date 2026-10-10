@@ -3,6 +3,14 @@ import { adminService } from '../services/adminService';
 import { queryKeys } from '../../infrastructure/cache/queryKeys';
 import { useToast } from '../providers/ToastProvider';
 
+export function useAdminShop(token: string | null, id: number | null) {
+  return useQuery({
+    queryKey: queryKeys.admin.shop(id ?? 0),
+    queryFn: () => (token && id ? adminService.getShop(token, id) : Promise.reject(new Error('Not authenticated'))),
+    enabled: Boolean(token) && Boolean(id),
+  });
+}
+
 export function useAdminShops(token: string | null, filters: { q?: string; includeDeleted?: boolean } = {}) {
   return useQuery({
     queryKey: queryKeys.admin.shops(filters),
@@ -48,8 +56,9 @@ export function useAdminShopMutations(token: string | null) {
       };
     }) =>
       token ? adminService.updateShop(token, data.id, data.changes) : Promise.reject(new Error('Not authenticated')),
-    onSuccess: () => {
+    onSuccess: (_d, vars) => {
       invalidate();
+      qc.invalidateQueries({ queryKey: queryKeys.admin.shop(vars.id) });
       toast({ title: 'Shop updated.', variant: 'success' });
     },
     onError: (error) => toast({ title: 'Could not update shop.', description: error instanceof Error ? error.message : undefined, variant: 'destructive' }),
@@ -122,7 +131,7 @@ export function useMemberMutations(token: string | null, shopId: number) {
 }
 export function useShopProducts(token: string | null, shopId: number) {
   return useQuery({
-    queryKey: ['admin', 'shops', shopId, 'products'],
+    queryKey: queryKeys.admin.shopProducts(shopId),
     queryFn: () => (token ? adminService.getShopProducts(token, shopId) : Promise.reject(new Error('Not authenticated'))),
     enabled: Boolean(token) && Boolean(shopId),
   });

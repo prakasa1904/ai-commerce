@@ -10,6 +10,8 @@ export const queryKeys = {
     products: (filters: { q?: string; includeDeleted?: boolean } = {}) =>
       ['admin', 'products', filters] as const,
     members: (shopId: number) => ['admin', 'shops', shopId, 'members'] as const,
+    shop: (id: number) => ['admin', 'shops', id] as const,
+    shopProducts: (shopId: number) => ['admin', 'shops', 'products', shopId] as const,
     productShops: (productId: number) => ['admin', 'products', productId, 'shops'] as const,
     ownShops: () => ['admin', 'own', 'shops'] as const,
   },
