@@ -3,6 +3,7 @@ import type { ProductCategory } from '../../domain/types/product';
 import Hero from './Hero';
 import GridViewCategory from '../../presentation/components/molecules/GridViewCategory';
 import GridViewProduct from '../../presentation/components/molecules/GridViewProduct';
+import FreshPickings from './FreshPickings';
 import SubscriptionBand from './SubscriptionBand';
 
 const HomePage: React.FC = () => {
@@ -13,6 +14,7 @@ const HomePage: React.FC = () => {
       <Hero />
       <GridViewCategory onSelect={setActiveCategory} active={activeCategory} />
       <GridViewProduct activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
+      <FreshPickings />
       <SubscriptionBand />
     </main>
   );
