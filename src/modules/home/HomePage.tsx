@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
   return (
     <main className="flex-1">
       <Hero />
-      <GridViewCategory onSelect={setActiveCategory} />
+      <GridViewCategory onSelect={setActiveCategory} active={activeCategory} />
       <GridViewProduct activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
       <SubscriptionBand />
     </main>

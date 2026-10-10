@@ -19,7 +19,7 @@ const RelatedProductsSection = ({ products, category }: RelatedProductsSectionPr
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-2 mb-8">
           <div>
             <p className="font-display text-xs font-black uppercase tracking-[0.25em] text-honey">
-              Hand-picked for you
+              Harvest &middot; related
             </p>
             <h2 className="font-display font-black text-3xl text-forest mt-1">From the same field</h2>
             <p className="text-sm text-soil/60 mt-1">

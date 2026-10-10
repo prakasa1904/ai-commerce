@@ -37,6 +37,13 @@
   --color-foreground: hsl(var(--foreground));
   --color-background: hsl(var(--background));
 
+  --color-ricepaper: #F7F1E3;
+  --color-line: 39 30% 80%;
+  --color-pine-mist: #EEF2EA;
+
+  --shadow-kraft: 0 2px 8px rgba(74,54,40,.08), 0 1px 2px rgba(74,54,40,.05);
+  --shadow-kraft-lg: 0 12px 32px rgba(74,54,40,.12), 0 4px 10px rgba(74,54,40,.06);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: calc(var(--radius) + 2px);
@@ -80,6 +87,8 @@
     font-family: var(--font-body);
     color: hsl(var(--foreground));
     background-color: hsl(var(--background));
+    background-image: radial-gradient(circle at 20% 30%, rgba(90,80,60,.04) 0 1px, transparent 2px), radial-gradient(circle at 75% 72%, rgba(90,80,60,.03) 0 1px, transparent 2px);
+    background-size: 100% 100%;
   }
   h1, h2, h3, .font-display {
     font-family: var(--font-display);

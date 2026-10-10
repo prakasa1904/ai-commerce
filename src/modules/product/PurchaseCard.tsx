@@ -6,11 +6,12 @@ interface PurchaseCardProps {
   product: Product;
   quantity: number;
   total: number;
-  onQuantityChange: (quantity: number) => void;
+  onDecrement: () => void;
+  onIncrement: () => void;
   onAddToCart: () => void;
 }
 
-const PurchaseCard = ({ product, quantity, total, onQuantityChange, onAddToCart }: PurchaseCardProps) => (
+const PurchaseCard = ({ product, quantity, total, onDecrement, onIncrement, onAddToCart }: PurchaseCardProps) => (
   // A kraft crate tag "tie-on" — like a label tied with twine on a bundle.
   <div className="lg:sticky lg:top-20 w-full lg:w-[20rem]">
     <div
@@ -55,8 +56,8 @@ const PurchaseCard = ({ product, quantity, total, onQuantityChange, onAddToCart 
         <QuantityStepper
           quantity={quantity}
           label="Qty"
-          onDecrement={() => onQuantityChange(Math.max(1, quantity - 1))}
-          onIncrement={() => onQuantityChange(quantity + 1)}
+          onDecrement={onDecrement}
+          onIncrement={onIncrement}
         />
         <div className="flex w-full items-center justify-between">
           <p className="font-display text-[0.62rem] font-black uppercase tracking-[0.2em] text-muted-foreground">

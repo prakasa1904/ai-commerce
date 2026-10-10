@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { useReducer } from 'react';
 import type { Product } from '../../domain/types/product';
 import { useProducts } from '../../application/hooks/useProducts';
+import { useCart } from '../../application/hooks/useCart';
+import { useToast } from '../../application/providers/ToastProvider';
 import ProductBreadcrumb from './ProductBreadcrumb';
 import ProductGallery from './ProductGallery';
 import ProductMobileHeader from './ProductMobileHeader';
@@ -19,20 +20,26 @@ interface ProductDetailProps {
 
 const RELATED_LIMIT = 4;
 
+const quantityReducer = (state: number, delta: 1 | -1): number => Math.max(1, state + delta);
+
 const ProductDetail = ({ product }: ProductDetailProps) => {
-  const router = useRouter();
-  const [quantity, setQuantity] = useState(1);
+  const { add } = useCart();
+  const { toast } = useToast();
+  const [quantity, dispatchQuantity] = useReducer(quantityReducer, 1);
   const { data: products } = useProducts();
   const imageUrl = product.imageUrl ?? FALLBACK_IMAGE_URL;
   const total = quantity * product.price;
 
-  const relatedProducts =
-    products
-      ?.filter((p) => p.category === product.category && p.id !== product.id)
-      .slice(0, RELATED_LIMIT) ?? [];
+  const relatedProducts = products
+    ?.filter((p) => p.category === product.category && p.id !== product.id)
+    .slice(0, RELATED_LIMIT) ?? [];
+
+  const handleDecrement = () => dispatchQuantity(-1);
+  const handleIncrement = () => dispatchQuantity(1);
 
   const handleAddToCart = () => {
-    void router.navigate({ to: '/', replace: true });
+    add(product, quantity);
+    toast({ variant: 'success', title: 'Added to crate', description: `${quantity} × ${product.title}` });
   };
 
   return (
@@ -50,11 +57,7 @@ const ProductDetail = ({ product }: ProductDetailProps) => {
             <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-6">
               <ProductInfo product={product} />
               <PurchaseCard
-                product={product}
-                quantity={quantity}
-                total={total}
-                onQuantityChange={setQuantity}
-                onAddToCart={handleAddToCart}
+                product={product} quantity={quantity} total={total} onDecrement={handleDecrement} onIncrement={handleIncrement} onAddToCart={handleAddToCart}
               />
             </div>
             <FarmGuaranteeSection />
@@ -63,7 +66,9 @@ const ProductDetail = ({ product }: ProductDetailProps) => {
 
         <RelatedProductsSection products={relatedProducts} category={product.category} />
 
-        <MobilePurchaseBar total={total} onAddToCart={handleAddToCart} />
+        <MobilePurchaseBar
+          quantity={quantity} total={total} onDecrement={handleDecrement} onIncrement={handleIncrement} onAddToCart={handleAddToCart}
+        />
       </div>
     </div>
   );

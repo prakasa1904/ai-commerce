@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
     <section
       id="top"
       aria-label="Today's harvest"
-      className="relative overflow-hidden bg-forest"
+      className="relative overflow-hidden bg-forest scroll-mt-16"
       style={{
         backgroundImage:
           'linear-gradient(rgba(31,59,44,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(31,59,44,0.18) 1px, transparent 1px)',
