@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Button } from '../../presentation/components/ui/button';
 import { Input } from '../../presentation/components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '../../presentation/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import BrandWordmark from '../../presentation/components/atoms/BrandWordmark';
 import { useAuthContext } from '../../application/providers/AuthProvider';
@@ -44,7 +45,15 @@ const LoginPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <label className="block">
             <span className="text-xs font-display font-black uppercase tracking-wider text-soil/70">Email</span>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              autoFocus
+              className="focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2"
+            />
           </label>
           <label className="block">
             <span className="text-xs font-display font-black uppercase tracking-wider text-soil/70">Password</span>
@@ -54,10 +63,20 @@ const LoginPage: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
+              className="focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2"
             />
           </label>
-          {error && <p className="text-sm text-rose-600 text-center">{error}</p>}
-          <Button type="submit" className="w-full" disabled={pending}>
+          {error && (
+            <Alert variant="destructive" className="text-left">
+              <AlertTitle>Sign in failed</AlertTitle>
+              <AlertDescription className="pt-1">{error}</AlertDescription>
+            </Alert>
+          )}
+          <Button
+            type="submit"
+            className="w-full focus-visible:ring-2 focus-visible:ring-honey focus-visible:ring-offset-2"
+            disabled={pending}
+          >
             {pending ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
             Sign in
           </Button>
