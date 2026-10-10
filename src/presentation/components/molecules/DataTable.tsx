@@ -22,6 +22,7 @@ interface DataTableProps<T> {
   loading?: boolean;
   skeletonRows?: number;
   getRowClassName?: (row: T) => string | undefined;
+  onRowClick?: (row: T) => void;
 }
 
 export function DataTable<T>({
@@ -37,6 +38,7 @@ export function DataTable<T>({
   loading = false,
   skeletonRows = 5,
   getRowClassName,
+  onRowClick,
 }: DataTableProps<T>) {
   const [showSkeleton, setShowSkeleton] = React.useState(false);
 
@@ -133,8 +135,10 @@ export function DataTable<T>({
                   key={(row as { id?: number | string }).id ?? i}
                   className={cn(
                     'border-b border-wheat/30 last:border-0 transition-colors hover:bg-cream/50',
+                    onRowClick ? 'cursor-pointer' : '',
                     getRowClassName?.(row)
                   )}
+                  onClick={() => onRowClick?.(row)}
                 >
                   {columns.map((col) => (
                     <td key={col.accessor} className="px-5 py-3 text-sm text-forest">
